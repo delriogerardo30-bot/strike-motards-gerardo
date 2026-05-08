@@ -1,0 +1,14 @@
+# Dependencias: Esta carpeta es pesadísima y Render la instalará solo
+node_modules/
+
+# Variables de entorno: Aquí van tus contraseñas de la base de datos
+.env
+
+# Archivos del sistema y temporales
+.DS_Store
+Thumbs.db
+npm-debug.log*
+
+# Build folders (si llegas a usar herramientas como Vite o React después)
+dist/
+build/
