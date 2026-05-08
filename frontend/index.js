@@ -1,9 +1,9 @@
 let cart = [];
 
-// DETECCIÓN DE API: Detecta si estás en tu PC o en el servidor de Render
+// DETECCIÓN DE API: Ya configurado para tu backend en Render
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3000'
-    : 'https://tu-backend-en-render.onrender.com'; // <--- Cambia esto cuando tengas tu URL de Render
+    : 'https://backend-strike-motards.onrender.com'; 
 
 async function cargarProductos() {
     try {
@@ -18,7 +18,6 @@ async function cargarProductos() {
             const card = document.createElement('div');
             card.className = 'card';
             
-            // Estructura idéntica a tu Figma (Imagen -> Info -> Precio/Botón)
             card.innerHTML = `
                 <div class="card-image">
                     <img src="${p.imagen_url || 'https://via.placeholder.com/300'}" alt="${p.nombre}">
@@ -37,7 +36,6 @@ async function cargarProductos() {
                 </div>
             `;
 
-            // El botón circular rojo de tu diseño
             const btn = card.querySelector('.btn-add-circle');
             btn.onclick = () => addCart(p);
 
@@ -53,7 +51,6 @@ async function cargarProductos() {
 function addCart(producto) {
     cart.push(producto);
     renderCart();
-    // Feedback visual (Opcional: puedes añadir un toast aquí)
     console.log(`Añadido: ${producto.nombre}`);
 }
 
@@ -107,7 +104,7 @@ function sendWhatsApp() {
 
     mensaje += `%0A💰 *Total a pagar: $${total.toFixed(2)} MXN*%0A%0A¿Me confirman la disponibilidad para entrega?`;
 
-    // Reemplaza con tu número real (ejemplo México: 521...)
+    // No olvides poner tu número real aquí después del 521
     const url = `https://wa.me/521XXXXXXXXXX?text=${mensaje}`;
     window.open(url, "_blank");
 }
