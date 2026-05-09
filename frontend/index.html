@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Strike Motards | Premium Gear</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #0A4D5C; 
@@ -41,13 +41,11 @@
             font-weight: 900; 
             letter-spacing: -1px;
             cursor: pointer;
-            color: var(--white);
         }
 
         .nav-links button { 
             background: none; border: none; color: var(--white); 
             margin-left: 20px; font-weight: 600; cursor: pointer;
-            transition: opacity 0.3s;
         }
 
         .btn-cart { 
@@ -63,21 +61,38 @@
         .seccion { display: none; min-height: 80vh; padding-top: 20px; }
         .active { display: block; }
 
-        #inicio {
-            background: linear-gradient(rgba(10, 77, 92, 0.7), rgba(10, 77, 92, 0.9)), 
-                        url('https://images.unsplash.com/photo-1558981403-c5f91cbba527?auto=format&fit=crop&q=80&w=1470');
-            background-size: cover; background-position: center;
-            height: 90vh; display: flex; flex-direction: column; justify-content: center; 
-            align-items: center; text-align: center;
+        /* ==================== TIENDA MEJORADA ==================== */
+        #tienda {
+            padding: 40px 5%;
         }
 
-        #inicio h2 { font-size: 3.5rem; margin-bottom: 10px; font-weight: 900; }
+        .tienda-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
 
-        #lista-productos {
+        .catalog-container {
+            display: flex;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .filters-sidebar {
+            width: 260px;
+            background: var(--primary-dark);
+            padding: 25px;
+            border-radius: 16px;
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+
+        .products-grid {
+            flex: 1;
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 25px;
-            padding: 40px 5%;
         }
 
         .card {
@@ -88,69 +103,93 @@
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .card:hover { transform: scale(1.03); box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-        .card img { width: 100%; height: 280px; object-fit: cover; }
+        .card:hover { 
+            transform: scale(1.03); 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+        }
+
+        .card img { 
+            width: 100%; 
+            height: 260px; 
+            object-fit: cover; 
+        }
+
         .card-content { padding: 20px; }
 
         .category-badge {
-            background: rgba(255, 59, 59, 0.1);
+            background: rgba(255, 59, 59, 0.15);
             color: var(--accent);
-            padding: 4px 12px;
+            padding: 5px 14px;
             border-radius: 50px;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 700;
-            text-transform: uppercase;
         }
 
-        .card h3 { margin: 15px 0 5px; font-size: 1.3rem; }
-        .card p { color: var(--zinc-300); font-size: 0.9rem; line-height: 1.4; }
-
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 20px;
+        .price { 
+            font-size: 1.7rem; 
+            font-weight: 800; 
+            color: var(--white); 
         }
-
-        .price-box .price { font-size: 1.6rem; font-weight: 800; color: var(--white); }
-        .price-box .currency { font-size: 0.8rem; color: var(--accent); margin-left: 4px; }
 
         .btn-add-circle {
             background: var(--accent);
-            color: white; border: none;
-            width: 45px; height: 45px;
-            border-radius: 12px; font-size: 1.5rem;
-            cursor: pointer; transition: background 0.3s;
+            color: white; 
+            border: none;
+            width: 48px; 
+            height: 48px;
+            border-radius: 12px; 
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: 0.3s;
         }
 
-        .btn-add-circle:hover { background: var(--accent-hover); }
-
-        #cart-modal {
-            display: none;
-            position: fixed;
-            right: 0; top: 0;
-            width: 100%; max-width: 400px; height: 100%;
-            background: #08333d;
-            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
-            z-index: 2000;
-            padding: 30px;
-            overflow-y: auto;
+        .btn-add-circle:hover {
+            background: var(--accent-hover);
+            transform: scale(1.1);
         }
 
-        .cart-item {
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 0;
+        .loading-msg, .no-results {
+            text-align: center; 
+            grid-column: 1/-1; 
+            padding: 80px 20px; 
+            font-size: 1.1rem;
+            color: var(--zinc-300);
         }
 
-        .btn-checkout {
-            background: var(--accent); color: white; border: none; width: 100%;
-            padding: 15px; border-radius: 12px; font-weight: 800; cursor: pointer;
-            margin-top: 20px;
+        /* Filtros */
+        .category-chip {
+            display: block;
+            padding: 12px 16px;
+            margin: 6px 0;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .loading-msg {
-            text-align: center; width: 100%; grid-column: 1/-1; 
-            padding: 50px; font-style: italic; color: var(--zinc-300);
+        .category-chip:hover,
+        .category-chip.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: none;
+            background: var(--primary-dark);
+            color: white;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 900px) {
+            .catalog-container {
+                flex-direction: column;
+            }
+            .filters-sidebar {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -165,6 +204,7 @@
     </div>
 </nav>
 
+<!-- Carrito (sin cambios) -->
 <div id="cart-modal">
     <div style="display: flex; justify-content: space-between; align-items: center;">
         <h2 style="margin: 0;">Tu Equipo</h2>
@@ -180,6 +220,7 @@
     </div>
 </div>
 
+<!-- Secciones -->
 <div id="inicio" class="seccion active">
     <h2>SIENTE LA VELOCIDAD</h2>
     <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.8;">Equipamiento de alto rendimiento para el asfalto.</p>
@@ -187,12 +228,27 @@
 </div>
 
 <div id="tienda" class="seccion">
-    <header style="text-align: center; padding: 40px 20px;">
-        <h1 style="font-size: 2.5rem; margin: 0;">EQUIPAMIENTO PROFESIONAL</h1>
-        <p style="color: var(--zinc-300);">Seleccionado para tu seguridad</p>
-    </header>
-    <div id="lista-productos">
-        <p class="loading-msg">Preparando motores y cargando catálogo... 🏍️</p>
+    <div class="tienda-header">
+        <h1 style="font-size: 2.8rem;">CATÁLOGO PREMIUM</h1>
+        <p style="color: var(--zinc-300);">Equipamiento profesional para motards</p>
+    </div>
+
+    <div class="catalog-container">
+        <!-- Filtros Sidebar -->
+        <div class="filters-sidebar">
+            <h3 style="margin-bottom: 15px; color: var(--accent);">Categorías</h3>
+            <div id="category-filters"></div>
+            
+            <h3 style="margin: 25px 0 15px; color: var(--accent);">Buscar</h3>
+            <input type="text" id="search-input" placeholder="Buscar productos...">
+        </div>
+
+        <!-- Productos -->
+        <div style="flex: 1;">
+            <div class="products-grid" id="lista-productos">
+                <!-- Cargado por JS -->
+            </div>
+        </div>
     </div>
 </div>
 
@@ -200,22 +256,13 @@
 
 <script>
     function mostrarSeccion(id) {
-        // Cerrar carrito al navegar
         document.getElementById('cart-modal').style.display = 'none';
-        
-        // Cambiar visibilidad de secciones
         document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        
         window.scrollTo(0,0);
-        
-        // Cargar productos solo si entramos a la tienda y la función existe
-        if(id === 'tienda') {
-            if (typeof cargarProductos === 'function') {
-                cargarProductos();
-            } else {
-                console.error("La función cargarProductos no se encuentra en index.js");
-            }
+
+        if(id === 'tienda' && typeof cargarProductos === 'function') {
+            cargarProductos();
         }
     }
 
