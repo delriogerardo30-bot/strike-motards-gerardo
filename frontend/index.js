@@ -15,7 +15,7 @@ async function cargarProductos() {
         renderProducts(allProducts);
     } catch (error) {
         console.error("Error cargando productos:", error);
-        document.getElementById('lista-productos').innerHTML = `<p style="text-align:center; padding:50px; color:#aaa;">Error al cargar productos. Inténtalo más tarde.</p>`;
+        document.getElementById('lista-productos').innerHTML = `<p style="text-align:center; padding:60px; color:#aaa;">Error al cargar los productos. Inténtalo más tarde.</p>`;
     }
 }
 
@@ -87,7 +87,7 @@ function addToCart(id) {
     cart.push(product);
     updateCartCount();
     
-    // Feedback visual
+    // Toast de confirmación
     const toast = document.createElement('div');
     toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#FF3B3B; color:white; padding:12px 24px; border-radius:8px; z-index:3000;';
     toast.textContent = `${product.nombre} añadido al carrito`;
@@ -127,7 +127,7 @@ function removeFromCart(index) {
     updateCartCount();
 }
 
-// ==================== CHECKOUT (Datos del cliente) ====================
+// ==================== CHECKOUT (Formulario) ====================
 function showCheckout() {
     if (cart.length === 0) {
         alert("El carrito está vacío");
@@ -137,22 +137,22 @@ function showCheckout() {
     const total = cart.reduce((sum, p) => sum + parseFloat(p.precio), 0);
 
     const checkoutHTML = `
-        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; display:flex; align-items:center; justify-content:center;">
+        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:3000; display:flex; align-items:center; justify-content:center;">
             <div style="background:#062D38; padding:30px; border-radius:16px; width:90%; max-width:500px; max-height:90vh; overflow:auto;">
-                <h2 style="text-align:center; margin-bottom:20px;">Datos de tu Pedido</h2>
+                <h2 style="text-align:center; margin-bottom:20px;">Completa tu Pedido</h2>
                 
                 <input type="text" id="cliente-nombre" placeholder="Nombre completo *" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white;">
-                <input type="tel" id="cliente-telefono" placeholder="Teléfono/WhatsApp *" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white;">
-                <textarea id="cliente-direccion" placeholder="Dirección completa (calle, colonia, ciudad, CP)" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white; min-height:80px;"></textarea>
+                <input type="tel" id="cliente-telefono" placeholder="Teléfono / WhatsApp *" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white;">
+                <textarea id="cliente-direccion" placeholder="Dirección de envío (calle, colonia, ciudad, CP)" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white; min-height:80px;"></textarea>
                 
                 <div style="margin:20px 0; padding:15px; background:#0A3D4A; border-radius:8px;">
-                    <h3>Resumen</h3>
-                    <p><strong>Total a pagar: $${total.toLocaleString('es-MX')} MXN</strong></p>
+                    <h3>Resumen del Pedido</h3>
+                    <p><strong>Total: $${total.toLocaleString('es-MX')} MXN</strong></p>
                 </div>
 
                 <div style="display:flex; gap:10px;">
                     <button onclick="closeCheckout()" style="flex:1; padding:14px; background:#444; border:none; border-radius:8px; color:white;">Cancelar</button>
-                    <button onclick="confirmOrder()" style="flex:1; padding:14px; background:var(--accent); border:none; border-radius:8px; color:white; font-weight:700;">Enviar Pedido por WhatsApp</button>
+                    <button onclick="confirmOrder()" style="flex:1; padding:14px; background:var(--accent); border:none; border-radius:8px; color:white; font-weight:700;">Enviar por WhatsApp</button>
                 </div>
             </div>
         </div>
@@ -192,37 +192,27 @@ function confirmOrder() {
 
     mensaje += `%0A*Total:* $${total.toLocaleString('es-MX')} MXN`;
 
-    const url = `https://wa.me/521XXXXXXXXXX?text=${mensaje}`; // Cambia tu número
+    const url = `https://wa.me/521XXXXXXXXXX?text=${mensaje}`; // ← Cambia tu número aquí
     window.open(url, "_blank");
 
     closeCheckout();
     cart = [];
     updateCartCount();
-    renderCart();
     toggleCart();
 }
 
 // ==================== INICIALIZACIÓN ====================
 document.addEventListener('DOMContentLoaded', () => {
-    // Botón Explorar Tienda
     const exploreBtn = document.querySelector('#inicio button');
     if (exploreBtn) {
         exploreBtn.addEventListener('click', () => mostrarSeccion('tienda'));
-    }
-
-    // Cargar productos al entrar
-    if (document.getElementById('tienda').classList.contains('active')) {
-        cargarProductos();
     }
 });
 
 function mostrarSeccion(id) {
     document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
     document.getElementById(id).classList.add('active');
-    
-    if (id === 'tienda') {
-        cargarProductos();
-    }
+    if (id === 'tienda') cargarProductos();
 }
 
 function toggleCart() {
