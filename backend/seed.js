@@ -1,37 +1,33 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
 const { Sequelize, DataTypes } = require('sequelize');
 
-const app = express();
-
-app.use(cors());
-app.use(express.json());
-
-// Conexión a PostgreSQL
-const sequelize = new Sequelize(process.env.DATABASE_URL, {
+const sequelize = new Sequelize('postgresql://db_strike_motards_user:nl9WU9z39iN62Zj0CPuRJ47w2jg7K0mF@dpg-d7v58jbeo5us73ebm2l0-a.oregon-postgres.render.com/db_strike_motards', {
   dialect: 'postgres',
-  logging: false,
   dialectOptions: {
     ssl: {
       require: true,
       rejectUnauthorized: false
     }
-  }
+  },
+  logging: false,
+  pool: { max: 5, acquire: 120000 }
 });
 
-// Modelo Producto
 const Producto = sequelize.define('Producto', {
   nombre: DataTypes.STRING,
   descripcion: DataTypes.TEXT,
   precio: DataTypes.DECIMAL(10, 2),
   imagen_url: DataTypes.TEXT,
   categoria: DataTypes.STRING
-}, { tableName: 'productos', timestamps: false });
+}, { 
+  tableName: 'productos', 
+  timestamps: false 
+});
 
-// ==================== RUTA PARA SEMBRAR PRODUCTOS ====================
-app.get('/seed', async (req, res) => {
+async function sembrarDatos() {
   try {
+    await sequelize.authenticate();
+    console.log('✅ Conexión establecida con Render.');
+
     const datos = [
       { nombre: "Casco Shark Spartan", descripcion: "Fibra de vidrio con visor solar integrado y aerodinámica avanzada.", precio: 5800.00, imagen_url: "https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?q=80&w=600", categoria: "Cascos" },
       { nombre: "Casco Fox V3 Motocross", descripcion: "Sistema de protección MIPS y ventilación optimizada.", precio: 4200.00, imagen_url: "https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=600", categoria: "Cascos" },
@@ -51,25 +47,12 @@ app.get('/seed', async (req, res) => {
     await Producto.destroy({ where: {}, truncate: true });
     await Producto.bulkCreate(datos);
 
-    res.json({ success: true, message: `✅ ${datos.length} productos insertados correctamente!` });
+    console.log(`🚀 ¡${datos.length} productos insertados con éxito!`);
+    process.exit(0);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('❌ Error:', error.message);
+    process.exit(1);
   }
-});
+}
 
-// ==================== OTRAS RUTAS ====================
-app.get('/', (req, res) => res.send('API Strike Motards funcionando 🚀'));
-
-app.get('/productos', async (req, res) => {
-  try {
-    const productos = await Producto.findAll();
-    res.json(productos);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Server corriendo en el puerto ${PORT}`);
-});
+sembrarDatos();
