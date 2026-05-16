@@ -192,7 +192,7 @@ function confirmOrder() {
 
     mensaje += `%0A*Total:* $${total.toLocaleString('es-MX')} MXN`;
 
-    const url = `https://wa.me/521XXXXXXXXXX?text=${mensaje}`; // ← Cambia tu número aquí
+    const url = `https://wa.me/527292529554?text=${mensaje}`; // ← Cambia tu número aquí
     window.open(url, "_blank");
 
     closeCheckout();
