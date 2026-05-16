@@ -1,11 +1,12 @@
 let cart = [];
 let allProducts = [];
 
-// DETECCIÓN DE API
+// Configuración API
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3000'
     : 'https://backend-strike-motards.onrender.com'; 
 
+// ==================== CARGAR PRODUCTOS ====================
 async function cargarProductos() {
     try {
         const res = await fetch(`${API_URL}/productos`);
@@ -14,17 +15,14 @@ async function cargarProductos() {
         renderProducts(allProducts);
     } catch (error) {
         console.error("Error cargando productos:", error);
-        const contenedor = document.getElementById('lista-productos');
-        if (contenedor) {
-            contenedor.innerHTML = `<p class="loading-msg">Error al cargar los productos. Inténtalo más tarde.</p>`;
-        }
+        document.getElementById('lista-productos').innerHTML = `<p style="text-align:center; padding:50px; color:#aaa;">Error al cargar productos. Inténtalo más tarde.</p>`;
     }
 }
 
+// ==================== FILTROS Y BÚSQUEDA ====================
 function renderFilters() {
     const categories = ['Todos', ...new Set(allProducts.map(p => p.categoria))];
     const container = document.getElementById('category-filters');
-    if (!container) return;
     
     container.innerHTML = categories.map(cat => `
         <div class="category-chip ${cat === 'Todos' ? 'active' : ''}" data-category="${cat}">
@@ -48,105 +46,187 @@ function filterProducts() {
     const activeCategory = document.querySelector('.category-chip.active')?.dataset.category || 'Todos';
 
     let filtered = allProducts;
+
     if (activeCategory !== 'Todos') {
         filtered = filtered.filter(p => p.categoria === activeCategory);
     }
+
     if (searchTerm) {
         filtered = filtered.filter(p => 
             p.nombre.toLowerCase().includes(searchTerm) || 
-            p.descripcion.toLowerCase().includes(searchTerm)
+            (p.descripcion && p.descripcion.toLowerCase().includes(searchTerm))
         );
     }
+
     renderProducts(filtered);
 }
 
 function renderProducts(productos) {
-    const contenedor = document.getElementById('lista-productos');
-    if (!contenedor) return;
-
-    if (productos.length === 0) {
-        contenedor.innerHTML = `<p class="no-results">No se encontraron productos 😔</p>`;
-        return;
-    }
-
-    contenedor.innerHTML = productos.map(p => `
+    const container = document.getElementById('lista-productos');
+    container.innerHTML = productos.map(p => `
         <div class="card">
-            <div style="position: relative;">
-                <img src="${p.imagen_url || 'https://via.placeholder.com/300'}" alt="${p.nombre}">
-                <span class="category-badge" style="position: absolute; top: 15px; left: 15px;">
-                    ${p.categoria || 'Accesorio'}
-                </span>
-            </div>
+            <img src="${p.imagen_url}" alt="${p.nombre}">
             <div class="card-content">
-                <h3 style="margin: 0 0 10px 0;">${p.nombre}</h3>
-                <p style="height: 40px; overflow: hidden;">${p.descripcion}</p>
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-                    <div class="price-box">
-                        <span class="price">$${parseFloat(p.precio).toLocaleString('es-MX')}</span>
-                        <span style="font-size: 0.8rem; font-weight: 600; color: #aaa;">MXN</span>
-                    </div>
-                    <button class="btn-add-circle" onclick="addCartFromId(${p.id})">+</button>
+                <span class="category-badge">${p.categoria}</span>
+                <h3>${p.nombre}</h3>
+                <p>${p.descripcion || ''}</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
+                    <span class="price">$${parseFloat(p.precio).toLocaleString('es-MX')}</span>
+                    <button class="btn-add" onclick="addToCart(${p.id})">+</button>
                 </div>
             </div>
         </div>
     `).join('');
 }
 
-function addCartFromId(id) {
+// ==================== CARRITO ====================
+function addToCart(id) {
     const product = allProducts.find(p => p.id === id);
-    if (product) addCart(product);
+    if (!product) return;
+    
+    cart.push(product);
+    updateCartCount();
+    
+    // Feedback visual
+    const toast = document.createElement('div');
+    toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#FF3B3B; color:white; padding:12px 24px; border-radius:8px; z-index:3000;';
+    toast.textContent = `${product.nombre} añadido al carrito`;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 1800);
 }
 
-function addCart(producto) {
-    cart.push(producto);
-    renderCart();
-    const toast = document.createElement('div');
-    toast.textContent = `✅ ${producto.nombre} añadido`;
-    toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:var(--accent); color:white; padding:12px 20px; border-radius:8px; z-index:3000;';
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2000);
+function updateCartCount() {
+    document.getElementById('cart-count').textContent = cart.length;
 }
 
 function renderCart() {
-    const cartCount = document.getElementById('cart-count');
-    const cartList = document.getElementById('cart-list');
-    const cartTotal = document.getElementById('cart-total');
-
-    if (cartCount) cartCount.innerText = cart.length;
-    let total = 0;
+    const list = document.getElementById('cart-list');
     let html = '';
+    let total = 0;
 
-    cart.forEach((p, index) => {
-        total += parseFloat(p.precio);
+    cart.forEach((item, index) => {
+        total += parseFloat(item.precio);
         html += `
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 10px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #1a4d5c;">
                 <div>
-                    <p style="margin:0; font-weight:600;">${p.nombre}</p>
-                    <p style="margin:4px 0 0; color: var(--accent);">$${parseFloat(p.precio).toFixed(2)}</p>
+                    <p style="margin:0; font-weight:500;">${item.nombre}</p>
+                    <p style="margin:4px 0 0; color:#aaa; font-size:0.95rem;">$${parseFloat(item.precio).toLocaleString('es-MX')}</p>
                 </div>
-                <button onclick="removeFromCart(${index})" style="background:none; border:none; color:#ff6b6b; cursor:pointer;">✕</button>
-            </div>`;
+                <button onclick="removeFromCart(${index})" style="background:none; border:none; color:#ff6b6b; font-size:1.4rem; cursor:pointer;">×</button>
+            </div>
+        `;
     });
 
-    if (cartList) cartList.innerHTML = html || '<p style="text-align:center; color:#888;">Tu carrito está vacío</p>';
-    if (cartTotal) cartTotal.innerText = total.toFixed(2);
+    list.innerHTML = html || '<p style="text-align:center; color:#777; padding:40px 0;">Tu carrito está vacío</p>';
+    document.getElementById('cart-total').textContent = total.toLocaleString('es-MX');
 }
 
 function removeFromCart(index) {
     cart.splice(index, 1);
     renderCart();
+    updateCartCount();
 }
 
-function sendWhatsApp() {
-    if (cart.length === 0) return alert("El carrito está vacío");
-    let mensaje = "🏍️ *Nuevo Pedido - Strike Motards* %0A%0A";
+// ==================== CHECKOUT (Datos del cliente) ====================
+function showCheckout() {
+    if (cart.length === 0) {
+        alert("El carrito está vacío");
+        return;
+    }
+
+    const total = cart.reduce((sum, p) => sum + parseFloat(p.precio), 0);
+
+    const checkoutHTML = `
+        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; display:flex; align-items:center; justify-content:center;">
+            <div style="background:#062D38; padding:30px; border-radius:16px; width:90%; max-width:500px; max-height:90vh; overflow:auto;">
+                <h2 style="text-align:center; margin-bottom:20px;">Datos de tu Pedido</h2>
+                
+                <input type="text" id="cliente-nombre" placeholder="Nombre completo *" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white;">
+                <input type="tel" id="cliente-telefono" placeholder="Teléfono/WhatsApp *" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white;">
+                <textarea id="cliente-direccion" placeholder="Dirección completa (calle, colonia, ciudad, CP)" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white; min-height:80px;"></textarea>
+                
+                <div style="margin:20px 0; padding:15px; background:#0A3D4A; border-radius:8px;">
+                    <h3>Resumen</h3>
+                    <p><strong>Total a pagar: $${total.toLocaleString('es-MX')} MXN</strong></p>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button onclick="closeCheckout()" style="flex:1; padding:14px; background:#444; border:none; border-radius:8px; color:white;">Cancelar</button>
+                    <button onclick="confirmOrder()" style="flex:1; padding:14px; background:var(--accent); border:none; border-radius:8px; color:white; font-weight:700;">Enviar Pedido por WhatsApp</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const modal = document.createElement('div');
+    modal.innerHTML = checkoutHTML;
+    modal.id = 'checkout-modal';
+    document.body.appendChild(modal);
+}
+
+function closeCheckout() {
+    const modal = document.getElementById('checkout-modal');
+    if (modal) modal.remove();
+}
+
+function confirmOrder() {
+    const nombre = document.getElementById('cliente-nombre').value.trim();
+    const telefono = document.getElementById('cliente-telefono').value.trim();
+    const direccion = document.getElementById('cliente-direccion').value.trim();
+
+    if (!nombre || !telefono) {
+        alert("Por favor completa nombre y teléfono");
+        return;
+    }
+
+    let mensaje = `🚀 *Nuevo Pedido - Strike Motards*%0A%0A`;
+    mensaje += `*Cliente:* ${nombre}%0A`;
+    mensaje += `*Teléfono:* ${telefono}%0A`;
+    if (direccion) mensaje += `*Dirección:* ${direccion}%0A%0A`;
+
     let total = 0;
     cart.forEach(p => {
-        mensaje += `• *${p.nombre}* - $${p.precio}%0A`;
+        mensaje += `• ${p.nombre} - $${p.precio}%0A`;
         total += parseFloat(p.precio);
     });
-    mensaje += `%0A💰 *Total: $${total.toFixed(2)} MXN*`;
-    window.open(`https://wa.me/521XXXXXXXXXX?text=${mensaje}`, "_blank");
+
+    mensaje += `%0A*Total:* $${total.toLocaleString('es-MX')} MXN`;
+
+    const url = `https://wa.me/521XXXXXXXXXX?text=${mensaje}`; // Cambia tu número
+    window.open(url, "_blank");
+
+    closeCheckout();
+    cart = [];
+    updateCartCount();
+    renderCart();
+    toggleCart();
 }
 
-document.addEventListener('DOMContentLoaded', cargarProductos);
+// ==================== INICIALIZACIÓN ====================
+document.addEventListener('DOMContentLoaded', () => {
+    // Botón Explorar Tienda
+    const exploreBtn = document.querySelector('#inicio button');
+    if (exploreBtn) {
+        exploreBtn.addEventListener('click', () => mostrarSeccion('tienda'));
+    }
+
+    // Cargar productos al entrar
+    if (document.getElementById('tienda').classList.contains('active')) {
+        cargarProductos();
+    }
+});
+
+function mostrarSeccion(id) {
+    document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    
+    if (id === 'tienda') {
+        cargarProductos();
+    }
+}
+
+function toggleCart() {
+    const modal = document.getElementById('cart-modal');
+    modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+    if (modal.style.display === 'block') renderCart();
+}
