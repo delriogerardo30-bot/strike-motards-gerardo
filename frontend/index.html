@@ -7,68 +7,86 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0A4D5C; 
-            --primary-dark: #083B47;
-            --accent: #FF3B3B;  
-            --accent-hover: #E63535;
-            --white: #ffffff;
-            --zinc-300: #d4d4d8;
+            --primary: #0A4D5C;
+            --dark: #062D38;
+            --accent: #FF3B3B;
+            --teal: #00D4C8;
         }
 
-        body { 
-            font-family: 'Inter', sans-serif; 
-            background: var(--primary); 
-            color: var(--white);
-            margin: 0; 
-            scroll-behavior: smooth;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--primary);
+            color: white;
+            line-height: 1.6;
         }
 
         nav {
-            background: rgba(10, 77, 92, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 15px 5%;
+            background: var(--dark);
+            padding: 1rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 1000;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
-        .logo { 
-            font-size: 1.6rem; 
-            font-weight: 900; 
+        .logo {
+            font-size: 1.9rem;
+            font-weight: 900;
             letter-spacing: -1px;
+        }
+
+        .nav-links button {
+            background: none;
+            border: none;
+            color: white;
+            margin-left: 30px;
+            font-weight: 600;
             cursor: pointer;
+            font-size: 1.05rem;
         }
 
-        .nav-links button { 
-            background: none; border: none; color: var(--white); 
-            margin-left: 20px; font-weight: 600; cursor: pointer;
-        }
-
-        .btn-cart { 
-            background: var(--accent) !important; 
-            padding: 8px 18px; 
-            border-radius: 50px; 
-            color: white; 
+        .btn-cart {
+            background: var(--accent);
+            padding: 10px 20px;
+            border-radius: 50px;
+            color: white;
             display: flex;
             align-items: center;
             gap: 8px;
+            font-weight: 600;
         }
 
-        .seccion { display: none; min-height: 80vh; padding-top: 20px; }
-        .active { display: block; }
-
-        /* ==================== TIENDA MEJORADA ==================== */
-        #tienda {
-            padding: 40px 5%;
-        }
-
-        .tienda-header {
+        /* HERO */
+        #inicio {
+            height: 85vh;
+            background: linear-gradient(rgba(6,45,56,0.8), rgba(6,45,56,0.85)),
+                        url('https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=2070') center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
             text-align: center;
-            margin-bottom: 40px;
+        }
+
+        #inicio h1 {
+            font-size: 4.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        #inicio p {
+            font-size: 1.4rem;
+            max-width: 700px;
+            margin-bottom: 2rem;
+        }
+
+        /* TIENDA */
+        #tienda {
+            padding: 60px 5%;
+            background: var(--dark);
         }
 
         .catalog-container {
@@ -80,174 +98,142 @@
 
         .filters-sidebar {
             width: 260px;
-            background: var(--primary-dark);
+            background: rgba(255,255,255,0.05);
             padding: 25px;
             border-radius: 16px;
             height: fit-content;
             position: sticky;
-            top: 90px;
+            top: 100px;
+        }
+
+        .filters-sidebar h3 {
+            color: var(--teal);
+            margin-bottom: 15px;
+        }
+
+        .category-chip {
+            padding: 12px 18px;
+            margin: 6px 0;
+            background: rgba(255,255,255,0.08);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .category-chip.active,
+        .category-chip:hover {
+            background: var(--accent);
+            color: white;
         }
 
         .products-grid {
             flex: 1;
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 25px;
         }
 
         .card {
-            background: var(--primary-dark);
-            border-radius: 20px;
+            background: #0A3D4A;
+            border-radius: 16px;
             overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: 0.4s;
         }
 
-        .card:hover { 
-            transform: scale(1.03); 
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4); 
+        .card:hover {
+            transform: translateY(-8px);
         }
 
-        .card img { 
-            width: 100%; 
-            height: 260px; 
-            object-fit: cover; 
+        .card img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
         }
 
-        .card-content { padding: 20px; }
+        .card-content {
+            padding: 18px;
+        }
 
         .category-badge {
-            background: rgba(255, 59, 59, 0.15);
-            color: var(--accent);
-            padding: 5px 14px;
+            background: rgba(0, 212, 200, 0.2);
+            color: var(--teal);
+            padding: 4px 12px;
             border-radius: 50px;
             font-size: 0.8rem;
-            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 10px;
         }
 
-        .price { 
-            font-size: 1.7rem; 
-            font-weight: 800; 
-            color: var(--white); 
-        }
-
-        .btn-add-circle {
-            background: var(--accent);
-            color: white; 
-            border: none;
-            width: 48px; 
-            height: 48px;
-            border-radius: 12px; 
+        .price {
             font-size: 1.6rem;
-            cursor: pointer;
-            transition: 0.3s;
+            font-weight: 800;
+            color: var(--accent);
         }
 
-        .btn-add-circle:hover {
-            background: var(--accent-hover);
-            transform: scale(1.1);
-        }
-
-        .loading-msg, .no-results {
-            text-align: center; 
-            grid-column: 1/-1; 
-            padding: 80px 20px; 
-            font-size: 1.1rem;
-            color: var(--zinc-300);
-        }
-
-        /* Filtros */
-        .category-chip {
-            display: block;
-            padding: 12px 16px;
-            margin: 6px 0;
-            background: rgba(255,255,255,0.05);
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .category-chip:hover,
-        .category-chip.active {
+        .btn-add {
             background: var(--accent);
             color: white;
-        }
-
-        #search-input {
-            width: 100%;
-            padding: 14px 16px;
-            border-radius: 12px;
             border: none;
-            background: var(--primary-dark);
-            color: white;
-            font-size: 1rem;
-        }
-
-        @media (max-width: 900px) {
-            .catalog-container {
-                flex-direction: column;
-            }
-            .filters-sidebar {
-                width: 100%;
-            }
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            font-size: 1.5rem;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
 <nav>
-    <div class="logo" onclick="mostrarSeccion('inicio')">STRIKE MOTARDS</div>
+    <div class="logo">STRIKE MOTARDS</div>
     <div class="nav-links">
         <button onclick="mostrarSeccion('inicio')">INICIO</button>
-        <button onclick="mostrarSeccion('tienda')">TIENDA</button>
+        <button onclick="mostrarSeccion('tienda')">CATÁLOGO</button>
         <button class="btn-cart" onclick="toggleCart()">🛒 <span id="cart-count">0</span></button>
     </div>
 </nav>
 
-<!-- Carrito (sin cambios) -->
-<div id="cart-modal">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2 style="margin: 0;">Tu Equipo</h2>
-        <button onclick="toggleCart()" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;">✕</button>
-    </div>
-    <div id="cart-list" style="margin-top: 20px;"></div>
-    <div style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 20px;">
-        <div style="display: flex; justify-content: space-between; font-size: 1.2rem;">
-            <span>Total:</span>
-            <span style="font-weight: 800; color: var(--accent);">$<span id="cart-total">0.00</span></span>
+<!-- CARRITO LATERAL -->
+<div id="cart-modal" style="display: none; position: fixed; right: 0; top: 0; width: 420px; height: 100%; background: #062D38; z-index: 2000; overflow-y: auto; padding: 25px; box-shadow: -10px 0 30px rgba(0,0,0,0.6);">
+    <h2>Tu Equipo</h2>
+    <div id="cart-list" style="margin: 25px 0;"></div>
+    <div style="border-top: 1px solid #1a4d5c; padding-top: 20px;">
+        <div style="display: flex; justify-content: space-between; font-size: 1.3rem;">
+            <strong>Total:</strong>
+            <strong style="color: var(--accent);">$<span id="cart-total">0.00</span></strong>
         </div>
-        <button class="btn-checkout" onclick="sendWhatsApp()">FINALIZAR POR WHATSAPP</button>
+        <button onclick="sendWhatsApp()" style="width:100%; margin-top:20px; padding:16px; background:var(--accent); border:none; color:white; font-weight:700; border-radius:12px;">
+            FINALIZAR POR WHATSAPP
+        </button>
     </div>
 </div>
 
-<!-- Secciones -->
+<!-- HERO -->
 <div id="inicio" class="seccion active">
-    <h2>SIENTE LA VELOCIDAD</h2>
-    <p style="font-size: 1.2rem; margin-bottom: 30px; opacity: 0.8;">Equipamiento de alto rendimiento para el asfalto.</p>
-    <button class="btn-checkout" style="width: 250px;" onclick="mostrarSeccion('tienda')">EXPLORAR TIENDA</button>
+    <h1>SIENTE LA VELOCIDAD</h1>
+    <p>Equipamiento de alto rendimiento para el asfalto.</p>
+    <button onclick="mostrarSeccion('tienda')" style="padding:15px 35px; background:var(--accent); border:none; border-radius:50px; color:white; font-size:1.1rem; cursor:pointer;">
+        EXPLORAR TIENDA
+    </button>
 </div>
 
+<!-- TIENDA -->
 <div id="tienda" class="seccion">
-    <div class="tienda-header">
-        <h1 style="font-size: 2.8rem;">CATÁLOGO PREMIUM</h1>
-        <p style="color: var(--zinc-300);">Equipamiento profesional para motards</p>
-    </div>
+    <h1 style="text-align:center; font-size:2.8rem; margin-bottom:10px;">CATÁLOGO PREMIUM</h1>
+    <p style="text-align:center; color:#aaa; margin-bottom:40px;">Equipamiento profesional para motards</p>
 
     <div class="catalog-container">
-        <!-- Filtros Sidebar -->
+        <!-- Sidebar Categorías -->
         <div class="filters-sidebar">
-            <h3 style="margin-bottom: 15px; color: var(--accent);">Categorías</h3>
+            <h3>Categorías</h3>
             <div id="category-filters"></div>
-            
-            <h3 style="margin: 25px 0 15px; color: var(--accent);">Buscar</h3>
-            <input type="text" id="search-input" placeholder="Buscar productos...">
         </div>
 
         <!-- Productos -->
-        <div style="flex: 1;">
-            <div class="products-grid" id="lista-productos">
-                <!-- Cargado por JS -->
-            </div>
+        <div style="flex:1">
+            <input type="text" id="search-input" placeholder="Buscar productos..." 
+                   style="width:100%; padding:15px; background:#0A3D4A; border:none; border-radius:12px; color:white; margin-bottom:30px;">
+            <div class="products-grid" id="lista-productos"></div>
         </div>
     </div>
 </div>
@@ -256,21 +242,15 @@
 
 <script>
     function mostrarSeccion(id) {
-        document.getElementById('cart-modal').style.display = 'none';
         document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
         document.getElementById(id).classList.add('active');
-        window.scrollTo(0,0);
-
-        if(id === 'tienda' && typeof cargarProductos === 'function') {
-            cargarProductos();
-        }
+        if (id === 'tienda') cargarProductos();
     }
 
     function toggleCart() {
-        const cart = document.getElementById('cart-modal');
-        cart.style.display = cart.style.display === 'block' ? 'none' : 'block';
+        const modal = document.getElementById('cart-modal');
+        modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
     }
 </script>
-
 </body>
 </html>
