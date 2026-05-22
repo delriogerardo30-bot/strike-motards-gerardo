@@ -15,7 +15,7 @@ async function cargarProductos() {
         renderProducts(allProducts);
     } catch (error) {
         console.error("Error cargando productos:", error);
-        document.getElementById('lista-productos').innerHTML = `<p style="text-align:center; padding:60px; color:#aaa;">Error al cargar los productos. Inténtalo más tarde.</p>`;
+        document.getElementById('lista-productos').innerHTML = `<p style="text-align:center; padding:60px; color:#aaa;">Error al cargar los productos.</p>`;
     }
 }
 
@@ -79,24 +79,31 @@ function renderProducts(productos) {
     `).join('');
 }
 
-// ==================== CARRITO ====================
+// ==================== CARRITO MEJORADO ====================
 function addToCart(id) {
     const product = allProducts.find(p => p.id === id);
     if (!product) return;
+
+    const existing = cart.find(item => item.id === id);
     
-    cart.push(product);
+    if (existing) {
+        existing.quantity = (existing.quantity || 1) + 1;
+    } else {
+        cart.push({ ...product, quantity: 1 });
+    }
+
     updateCartCount();
     
-    // Toast de confirmación
     const toast = document.createElement('div');
     toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#FF3B3B; color:white; padding:12px 24px; border-radius:8px; z-index:3000;';
-    toast.textContent = `${product.nombre} añadido al carrito`;
+    toast.textContent = `${product.nombre} añadido`;
     document.body.appendChild(toast);
     setTimeout(() => toast.remove(), 1800);
 }
 
 function updateCartCount() {
-    document.getElementById('cart-count').textContent = cart.length;
+    const count = cart.reduce((sum, item) => sum + (item.quantity || 1), 0);
+    document.getElementById('cart-count').textContent = count;
 }
 
 function renderCart() {
@@ -105,20 +112,36 @@ function renderCart() {
     let total = 0;
 
     cart.forEach((item, index) => {
-        total += parseFloat(item.precio);
+        const qty = item.quantity || 1;
+        total += parseFloat(item.precio) * qty;
+
         html += `
-            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #1a4d5c;">
-                <div>
+            <div class="cart-item">
+                <div style="flex:1">
                     <p style="margin:0; font-weight:500;">${item.nombre}</p>
-                    <p style="margin:4px 0 0; color:#aaa; font-size:0.95rem;">$${parseFloat(item.precio).toLocaleString('es-MX')}</p>
+                    <p style="margin:4px 0 0; color:#aaa;">$${parseFloat(item.precio).toLocaleString('es-MX')}</p>
                 </div>
-                <button onclick="removeFromCart(${index})" style="background:none; border:none; color:#ff6b6b; font-size:1.4rem; cursor:pointer;">×</button>
+                
+                <div class="quantity-controls">
+                    <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">–</button>
+                    <span style="min-width:28px; text-align:center; font-weight:600;">${qty}</span>
+                    <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
+                </div>
+                
+                <button onclick="removeFromCart(${index})" style="background:none; border:none; color:#ff6b6b; font-size:1.5rem; cursor:pointer; margin-left:15px;">×</button>
             </div>
         `;
     });
 
-    list.innerHTML = html || '<p style="text-align:center; color:#777; padding:40px 0;">Tu carrito está vacío</p>';
+    list.innerHTML = html || '<p style="text-align:center; color:#777; padding:60px 0;">Tu carrito está vacío</p>';
     document.getElementById('cart-total').textContent = total.toLocaleString('es-MX');
+}
+
+function changeQuantity(index, change) {
+    cart[index].quantity = (cart[index].quantity || 1) + change;
+    if (cart[index].quantity < 1) cart[index].quantity = 1;
+    renderCart();
+    updateCartCount();
 }
 
 function removeFromCart(index) {
@@ -127,14 +150,14 @@ function removeFromCart(index) {
     updateCartCount();
 }
 
-// ==================== CHECKOUT (Formulario) ====================
+// ==================== CHECKOUT ====================
 function showCheckout() {
     if (cart.length === 0) {
         alert("El carrito está vacío");
         return;
     }
 
-    const total = cart.reduce((sum, p) => sum + parseFloat(p.precio), 0);
+    const total = cart.reduce((sum, item) => sum + parseFloat(item.precio) * (item.quantity || 1), 0);
 
     const checkoutHTML = `
         <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:3000; display:flex; align-items:center; justify-content:center;">
@@ -186,13 +209,14 @@ function confirmOrder() {
 
     let total = 0;
     cart.forEach(p => {
-        mensaje += `• ${p.nombre} - $${p.precio}%0A`;
-        total += parseFloat(p.precio);
+        const qty = p.quantity || 1;
+        mensaje += `• ${qty}x ${p.nombre} - $${p.precio}%0A`;
+        total += parseFloat(p.precio) * qty;
     });
 
     mensaje += `%0A*Total:* $${total.toLocaleString('es-MX')} MXN`;
 
-    const url = `https://wa.me/527292529554?text=${mensaje}`; // ← Cambia tu número aquí
+    const url = `https://wa.me/527292529554?text=${mensaje}`;
     window.open(url, "_blank");
 
     closeCheckout();
@@ -204,9 +228,7 @@ function confirmOrder() {
 // ==================== INICIALIZACIÓN ====================
 document.addEventListener('DOMContentLoaded', () => {
     const exploreBtn = document.querySelector('#inicio button');
-    if (exploreBtn) {
-        exploreBtn.addEventListener('click', () => mostrarSeccion('tienda'));
-    }
+    if (exploreBtn) exploreBtn.addEventListener('click', () => mostrarSeccion('tienda'));
 });
 
 function mostrarSeccion(id) {

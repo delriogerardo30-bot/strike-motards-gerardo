@@ -1,12 +1,12 @@
 const { Sequelize, DataTypes } = require('sequelize');
 
-// Usamos la URL interna para que Render se conecte directamente dentro de su red
-const DATABASE_URL = 'postgresql://db_strike_motards_user:nl9WU9z39iN62Zj0CPuRJ47w2jg7K0mF@dpg-d7v58jbeo5us73ebm2l0-a/db_strike_motards';
-
-const sequelize = new Sequelize(DATABASE_URL, {
+const sequelize = new Sequelize('postgresql://db_strike_motards_user:nl9WU9z39iN62Zj0CPuRJ47w2jg7K0mF@dpg-d7v58jbeo5us73ebm2l0-a.oregon-postgres.render.com/db_strike_motards', {
   dialect: 'postgres',
   logging: false,
-  dialectOptions: { ssl: { require: true, rejectUnauthorized: false } }
+  dialectOptions: {
+    ssl: { require: true, rejectUnauthorized: false }
+  },
+  pool: { max: 5, acquire: 120000 }
 });
 
 const Producto = sequelize.define('Producto', {
@@ -17,44 +17,55 @@ const Producto = sequelize.define('Producto', {
   categoria: DataTypes.STRING
 }, { tableName: 'productos', timestamps: false });
 
-async function insertar() {
+async function sembrarDatos() {
   try {
     await sequelize.authenticate();
-    console.log('✅ Conexión interna establecida con éxito.');
+    console.log('✅ Conexión establecida.');
 
-    const productos = [
-      // --- LOS 5 ORIGINALES ---
-      { nombre: "Casco Shark Spartan", descripcion: "Fibra de vidrio y visor solar.", precio: 5800, categoria: "Cascos", imagen_url: "https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?w=500" },
-      { nombre: "Casco Fox V3", descripcion: "Protección MIPS profesional.", precio: 4200, categoria: "Cascos", imagen_url: "https://images.unsplash.com/photo-1558981403-c5f91bbba527?w=500" },
-      { nombre: "Chamarra Alpine Tech", descripcion: "Protección nivel 2.", precio: 4950, categoria: "Ropa", imagen_url: "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=500" },
-      { nombre: "Guantes GP Plus", descripcion: "Piel y fibra de carbono.", precio: 1250, categoria: "Accesorios", imagen_url: "https://images.unsplash.com/photo-1582531608229-239414e259e8?w=500" },
-      { nombre: "Intercomunicador Mesh", descripcion: "Sonido Premium HD.", precio: 3900, categoria: "Tecnología", imagen_url: "https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?w=500" },
-      
-      // --- LOS 10 NUEVOS REGISTROS ---
-      { nombre: "Botas Racing Sport", descripcion: "Protección rígida en tobillos y deslizadores de acero.", precio: 3400.00, categoria: "Calzado", imagen_url: "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?w=500" },
-      { nombre: "Pantalón Kevlar Street", descripcion: "Reforzado con fibra de Kevlar y protecciones en rodillas.", precio: 2100.00, categoria: "Ropa", imagen_url: "https://images.unsplash.com/photo-1542272454315-4c01d7afdf4a?w=500" },
-      { nombre: "Mochila Rígida Carbon", descripcion: "Diseño aerodinámico e impermeable para altas velocidades.", precio: 1550.00, categoria: "Accesorios", imagen_url: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500" },
-      { nombre: "Soporte Celular CNC", descripcion: "Aluminio aeronáutico con vibración reducida.", precio: 850.00, categoria: "Tecnología", imagen_url: "https://images.unsplash.com/photo-1586776977607-310e9c725c37?w=500" },
-      { nombre: "Funda Motocicleta Pro", descripcion: "Protección UV y lluvia con interior afelpado.", precio: 650.00, categoria: "Accesorios", imagen_url: "https://images.unsplash.com/photo-1558981420-87aa9dad1c89?w=500" },
-      { nombre: "Kit de Limpieza Cadena", descripcion: "Desengrasante potente y cepillo ergonómico.", precio: 450.00, categoria: "Mantenimiento", imagen_url: "https://images.unsplash.com/photo-1611003228941-98a5216802ff?w=500" },
-      { nombre: "Espejos Bar End", descripcion: "Diseño café racer en aluminio negro mate.", precio: 1100.00, categoria: "Accesorios", imagen_url: "https://images.unsplash.com/photo-1591132807183-4917f9d7b1ca?w=500" },
-      { nombre: "Cargador USB Dual", descripcion: "Carga rápida con voltímetro integrado.", precio: 380.00, categoria: "Tecnología", imagen_url: "https://images.unsplash.com/photo-1583394838336-acd97773efff?w=500" },
-      { nombre: "Slider de Motor Gix", descripcion: "Protección anticaídas de alta resistencia.", precio: 1800.00, categoria: "Accesorios", imagen_url: "https://images.unsplash.com/photo-1622185135505-2d795003994a?w=500" },
-      { nombre: "Guantes Invierno Thermal", descripcion: "Membrana impermeable y forro térmico interno.", precio: 950.00, categoria: "Accesorios", imagen_url: "https://images.unsplash.com/photo-1582531608229-239414e259e8?w=500" }
+    const datos = [
+      // === CASCOS (8) ===
+      { nombre: "Casco Shark Spartan", descripcion: "Fibra de vidrio con visor solar integrado y aerodinámica avanzada.", precio: 5800, imagen_url: "https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?q=80&w=600", categoria: "Cascos" },
+      { nombre: "Casco Fox V3 Motocross", descripcion: "Sistema MIPS y ventilación optimizada para off-road.", precio: 4200, imagen_url: "https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=600", categoria: "Cascos" },
+      { nombre: "Casco HJC RPHA 11", descripcion: "Premium con excelente ventilación y peso ligero.", precio: 6500, imagen_url: "https://images.unsplash.com/photo-1590502593744-8c3a5c9f8a0c?q=80&w=600", categoria: "Cascos" },
+      { nombre: "Casco Arai Corsair-X", descripcion: "Máxima protección y confort profesional.", precio: 9200, imagen_url: "https://images.unsplash.com/photo-1617112848920-5e9c8c8c8c8c?q=80&w=600", categoria: "Cascos" },
+      { nombre: "Casco Shoei NXR2", descripcion: "Alta gama con aislamiento acústico superior.", precio: 8500, imagen_url: "https://images.unsplash.com/photo-1600585154340-be6161a56a9c?q=80&w=600", categoria: "Cascos" },
+      { nombre: "Casco Bell Qualifier", descripcion: "Excelente relación calidad-precio.", precio: 3200, imagen_url: "https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=600", categoria: "Cascos" },
+
+      // === ROPA (8) ===
+      { nombre: "Chamarra Alpine Tech", descripcion: "Protección nivel 2 con ventilación regulable.", precio: 4950, imagen_url: "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?q=80&w=600", categoria: "Ropa" },
+      { nombre: "Protector Espalda Pro", descripcion: "Nivel máximo de seguridad ergonómico.", precio: 1100, imagen_url: "https://images.unsplash.com/photo-1444858291040-58f756a3bdd6?q=80&w=600", categoria: "Ropa" },
+      { nombre: "Pantalón Racing Kevlar", descripcion: "Alta resistencia con protecciones en rodillas.", precio: 3200, imagen_url: "https://images.unsplash.com/photo-1600585154340-be6161a56a9c?q=80&w=600", categoria: "Ropa" },
+      { nombre: "Chaleco Airbag", descripcion: "Tecnología de airbag para máxima protección.", precio: 8500, imagen_url: "https://images.unsplash.com/photo-1551028719-00167b16b4d0?q=80&w=600", categoria: "Ropa" },
+      { nombre: "Sudadera Motard Hoodie", descripcion: "Estilo urbano con protecciones homologadas.", precio: 1850, imagen_url: "https://images.unsplash.com/photo-1552374196-c4e7ffc2f4e3?q=80&w=600", categoria: "Ropa" },
+      { nombre: "Traje de Lluvia Pro", descripcion: "Conjunto completo impermeable.", precio: 1450, imagen_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=600", categoria: "Ropa" },
+
+      // === ACCESORIOS (8) ===
+      { nombre: "Guantes GP Plus", descripcion: "Piel con protecciones de carbono en nudillos.", precio: 1250, imagen_url: "https://images.unsplash.com/photo-1582531608229-239414e259e8?q=80&w=600", categoria: "Accesorios" },
+      { nombre: "Mochila Rígida Carbon", descripcion: "Diseño aerodinámico resistente al agua.", precio: 1550, imagen_url: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=600", categoria: "Accesorios" },
+      { nombre: "Antirrobo Disco Freno", descripcion: "Alta seguridad con alarma incorporada.", precio: 980, imagen_url: "https://images.unsplash.com/photo-1605559424843-9e4c228d1c8e?q=80&w=600", categoria: "Accesorios" },
+      { nombre: "Kit Herramientas Moto", descripcion: "Set profesional compacto para ruta.", precio: 890, imagen_url: "https://images.unsplash.com/photo-1581235720704-06d3acfcb36f?q=80&w=600", categoria: "Accesorios" },
+      { nombre: "Cargador USB Dual", descripcion: "Carga rápida impermeable.", precio: 650, imagen_url: "https://images.unsplash.com/photo-1583394838336-acd97773efff?q=80&w=600", categoria: "Accesorios" },
+
+      // === CALZADO (4) ===
+      { nombre: "Botas Sport Track", descripcion: "Refuerzo en tobillo y gran agarre.", precio: 2800, imagen_url: "https://images.unsplash.com/photo-1609144089237-775905d5154e?q=80&w=600", categoria: "Calzado" },
+      { nombre: "Botas Touring Impermeables", descripcion: "Máxima comodidad y protección contra lluvia.", precio: 3650, imagen_url: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=600", categoria: "Calzado" },
+      { nombre: "Botas Urban Cortas", descripcion: "Estilo casual con protección homologada.", precio: 2350, imagen_url: "https://images.unsplash.com/photo-1600585154340-be6161a56a9c?q=80&w=600", categoria: "Calzado" },
+
+      // === TECNOLOGÍA (4) ===
+      { nombre: "Intercomunicador Mesh", descripcion: "Sonido Premium y comunicación grupal.", precio: 3900, imagen_url: "https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?q=80&w=600", categoria: "Tecnología" },
+      { nombre: "Cámara 360 para Moto", descripcion: "Grabación 4K con visión panorámica.", precio: 4500, imagen_url: "https://images.unsplash.com/photo-1605559424843-9e4c228d1c8e?q=80&w=600", categoria: "Tecnología" },
+      { nombre: "GPS Garmin Zumo", descripcion: "Navegación especializada para motociclistas.", precio: 7200, imagen_url: "https://images.unsplash.com/photo-1617112848920-5e9c8c8c8c8c?q=80&w=600", categoria: "Tecnología" }
     ];
 
-    // Borramos los registros viejos para que no se dupliquen
-    await Producto.destroy({ where: {}, truncate: true, cascade: true });
-    
-    // Insertamos la lista completa
-    await Producto.bulkCreate(productos);
-    
-    console.log('🚀 ¡Catálogo de 15 productos actualizado exitosamente en Render!');
+    await Producto.destroy({ where: {}, truncate: true });
+    await Producto.bulkCreate(datos);
+
+    console.log(`🚀 ¡${datos.length} productos insertados con éxito!`);
     process.exit(0);
-  } catch (e) {
-    console.error('❌ Error durante el sembrado:', e.message);
+  } catch (error) {
+    console.error('❌ Error:', error.message);
     process.exit(1);
   }
 }
 
-insertar();
+sembrarDatos();
