@@ -1,29 +1,54 @@
 let cart = [];
 let allProducts = [];
+let productsLoaded = false;
 
 // Configuración API
 const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     ? 'http://localhost:3000'
-    : 'https://backend-strike-motards.onrender.com'; 
+    : 'https://backend-strike-motards.onrender.com';
 
 // ==================== CARGAR PRODUCTOS ====================
 async function cargarProductos() {
+    const container = document.getElementById('lista-productos');
+
+    if (productsLoaded) {
+        renderProducts(allProducts);
+        return;
+    }
+
     try {
+        container.innerHTML = `
+            <p style="text-align:center; padding:60px; color:#aaa; grid-column:1/-1;">
+                Cargando productos...
+            </p>
+        `;
+
         const res = await fetch(`${API_URL}/productos`);
+
+        if (!res.ok) {
+            throw new Error("No se pudo conectar con el servidor");
+        }
+
         allProducts = await res.json();
+        productsLoaded = true;
+
         renderFilters();
         renderProducts(allProducts);
     } catch (error) {
         console.error("Error cargando productos:", error);
-        document.getElementById('lista-productos').innerHTML = `<p style="text-align:center; padding:60px; color:#aaa;">Error al cargar los productos.</p>`;
+        container.innerHTML = `
+            <p style="text-align:center; padding:60px; color:#aaa; grid-column:1/-1;">
+                Error al cargar los productos.
+            </p>
+        `;
     }
 }
 
 // ==================== FILTROS Y BÚSQUEDA ====================
 function renderFilters() {
-    const categories = ['Todos', ...new Set(allProducts.map(p => p.categoria))];
+    const categories = ['Todos', ...new Set(allProducts.map(p => p.categoria || 'Accesorios'))];
     const container = document.getElementById('category-filters');
-    
+
     container.innerHTML = categories.map(cat => `
         <div class="category-chip ${cat === 'Todos' ? 'active' : ''}" data-category="${cat}">
             ${cat}
@@ -38,7 +63,10 @@ function renderFilters() {
         });
     });
 
-    document.getElementById('search-input').addEventListener('input', filterProducts);
+    const searchInput = document.getElementById('search-input');
+
+    searchInput.removeEventListener('input', filterProducts);
+    searchInput.addEventListener('input', filterProducts);
 }
 
 function filterProducts() {
@@ -48,13 +76,14 @@ function filterProducts() {
     let filtered = allProducts;
 
     if (activeCategory !== 'Todos') {
-        filtered = filtered.filter(p => p.categoria === activeCategory);
+        filtered = filtered.filter(p => (p.categoria || 'Accesorios') === activeCategory);
     }
 
     if (searchTerm) {
-        filtered = filtered.filter(p => 
-            p.nombre.toLowerCase().includes(searchTerm) || 
-            (p.descripcion && p.descripcion.toLowerCase().includes(searchTerm))
+        filtered = filtered.filter(p =>
+            p.nombre.toLowerCase().includes(searchTerm) ||
+            (p.descripcion && p.descripcion.toLowerCase().includes(searchTerm)) ||
+            (p.categoria && p.categoria.toLowerCase().includes(searchTerm))
         );
     }
 
@@ -63,16 +92,30 @@ function filterProducts() {
 
 function renderProducts(productos) {
     const container = document.getElementById('lista-productos');
+
+    if (!productos.length) {
+        container.innerHTML = `
+            <p style="text-align:center; padding:60px; color:#aaa; grid-column:1/-1;">
+                No se encontraron productos.
+            </p>
+        `;
+        return;
+    }
+
     container.innerHTML = productos.map(p => `
         <div class="card">
-            <img src="${p.imagen_url}" alt="${p.nombre}">
+            <div class="card-img-wrap">
+                <img src="${p.imagen_url}" alt="${p.nombre}">
+            </div>
+
             <div class="card-content">
-                <span class="category-badge">${p.categoria}</span>
+                <span class="category-badge">${p.categoria || 'Accesorios'}</span>
                 <h3>${p.nombre}</h3>
-                <p>${p.descripcion || ''}</p>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:15px;">
+                <p>${p.descripcion || 'Producto premium para motociclistas.'}</p>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:18px; gap:12px;">
                     <span class="price">$${parseFloat(p.precio).toLocaleString('es-MX')}</span>
-                    <button class="btn-add" onclick="addToCart(${p.id})">+</button>
+                    <button class="btn-add" onclick="addToCart(${p.id})">Agregar</button>
                 </div>
             </div>
         </div>
@@ -85,6 +128,7 @@ function addToCart(id) {
     if (!product) return;
 
     const existing = cart.find(item => item.id === id);
+
     if (existing) {
         existing.quantity = (existing.quantity || 1) + 1;
     } else {
@@ -92,12 +136,7 @@ function addToCart(id) {
     }
 
     updateCartCount();
-    
-    const toast = document.createElement('div');
-    toast.style.cssText = 'position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#FF3B3B; color:white; padding:12px 24px; border-radius:8px; z-index:3000;';
-    toast.textContent = `${product.nombre} añadido`;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 1800);
+    showToast(`${product.nombre} añadido al carrito`);
 }
 
 function updateCartCount() {
@@ -112,32 +151,49 @@ function renderCart() {
 
     cart.forEach((item, index) => {
         const qty = item.quantity || 1;
-        total += parseFloat(item.precio) * qty;
+        const itemTotal = parseFloat(item.precio) * qty;
+        total += itemTotal;
 
         html += `
-            <div style="display:flex; gap:15px; padding:15px 0; border-bottom:1px solid #1a4d5c;">
-                <img src="${item.imagen_url}" style="width:70px; height:70px; object-fit:cover; border-radius:8px;">
+            <div class="cart-item">
+                <img src="${item.imagen_url}" alt="${item.nombre}">
+
                 <div style="flex:1">
-                    <p style="font-weight:600;">${item.nombre}</p>
-                    <p style="color:#aaa;">$${parseFloat(item.precio).toLocaleString('es-MX')}</p>
+                    <p style="font-weight:800;">${item.nombre}</p>
+                    <p style="color:#aaa;">$${parseFloat(item.precio).toLocaleString('es-MX')} MXN</p>
+                    <p style="color:var(--teal); font-size:0.9rem;">
+                        Subtotal: $${itemTotal.toLocaleString('es-MX')}
+                    </p>
                 </div>
+
                 <div style="display:flex; align-items:center; gap:8px;">
-                    <button onclick="changeQuantity(${index}, -1)" style="width:28px;height:28px;background:#1a4d5c;color:white;border:none;border-radius:6px;">–</button>
-                    <span style="min-width:24px;text-align:center;">${qty}</span>
-                    <button onclick="changeQuantity(${index}, 1)" style="width:28px;height:28px;background:#1a4d5c;color:white;border:none;border-radius:6px;">+</button>
+                    <button class="qty-btn" onclick="changeQuantity(${index}, -1)">–</button>
+                    <span style="min-width:24px;text-align:center;font-weight:800;">${qty}</span>
+                    <button class="qty-btn" onclick="changeQuantity(${index}, 1)">+</button>
                 </div>
-                <button onclick="removeFromCart(${index})" style="background:none;border:none;color:#ff6b6b;font-size:1.6rem;cursor:pointer;">×</button>
+
+                <button class="remove-btn" onclick="removeFromCart(${index})">×</button>
             </div>
         `;
     });
 
-    list.innerHTML = html || '<p style="text-align:center; color:#777; padding:80px 0;">Tu carrito está vacío</p>';
-    document.getElementById('cart-total').textContent = total.toLocaleString('es-MX');
+    list.innerHTML = html || `
+        <p style="text-align:center; color:#777; padding:80px 0;">
+            Tu carrito está vacío
+        </p>
+    `;
+
+    document.getElementById('subtotal').textContent = `$${total.toLocaleString('es-MX')}`;
+    document.getElementById('cart-total').textContent = `$${total.toLocaleString('es-MX')}`;
 }
 
 function changeQuantity(index, change) {
     cart[index].quantity = (cart[index].quantity || 1) + change;
-    if (cart[index].quantity < 1) cart[index].quantity = 1;
+
+    if (cart[index].quantity < 1) {
+        cart[index].quantity = 1;
+    }
+
     renderCart();
     updateCartCount();
 }
@@ -150,32 +206,40 @@ function removeFromCart(index) {
 
 function toggleCart() {
     const modal = document.getElementById('cart-modal');
+
     modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-    if (modal.style.display === 'flex') renderCart();
+
+    if (modal.style.display === 'flex') {
+        renderCart();
+    }
 }
 
 // ==================== CHECKOUT CON VALIDACIÓN ====================
 function showCheckout() {
-    if (cart.length === 0) return alert("El carrito está vacío");
+    if (cart.length === 0) {
+        return alert("El carrito está vacío");
+    }
 
-    const total = cart.reduce((sum, item) => sum + parseFloat(item.precio) * (item.quantity || 1), 0);
+    const total = cart.reduce((sum, item) => {
+        return sum + parseFloat(item.precio) * (item.quantity || 1);
+    }, 0);
 
     const checkoutHTML = `
-        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:3000; display:flex; align-items:center; justify-content:center;">
-            <div style="background:#062D38; padding:30px; border-radius:16px; width:90%; max-width:500px;">
-                <h2 style="text-align:center; margin-bottom:20px;">Completa tu Pedido</h2>
-                
-                <input type="text" id="cliente-nombre" placeholder="Nombre completo *" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white;">
-                <input type="tel" id="cliente-telefono" placeholder="Teléfono / WhatsApp *" maxlength="10" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white;">
-                <textarea id="cliente-direccion" placeholder="Dirección de envío (calle, colonia, ciudad, CP)" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white; min-height:80px;"></textarea>
-                
-                <div style="margin:20px 0; padding:15px; background:#0A3D4A; border-radius:8px;">
+        <div class="checkout-modal">
+            <div class="checkout-card">
+                <h2>Completa tu Pedido</h2>
+
+                <input type="text" id="cliente-nombre" placeholder="Nombre completo *">
+                <input type="tel" id="cliente-telefono" placeholder="Teléfono / WhatsApp *" maxlength="10">
+                <textarea id="cliente-direccion" placeholder="Dirección de envío (calle, colonia, ciudad, CP)"></textarea>
+
+                <div class="checkout-total">
                     <p><strong>Total: $${total.toLocaleString('es-MX')} MXN</strong></p>
                 </div>
 
-                <div style="display:flex; gap:10px;">
-                    <button onclick="closeCheckout()" style="flex:1; padding:14px; background:#444; border:none; border-radius:8px; color:white;">Cancelar</button>
-                    <button onclick="confirmOrder()" style="flex:1; padding:14px; background:var(--accent); border:none; border-radius:8px; color:white; font-weight:700;">Enviar por WhatsApp</button>
+                <div class="checkout-actions">
+                    <button onclick="closeCheckout()" class="btn-cancel">Cancelar</button>
+                    <button onclick="confirmOrder()" class="btn-whatsapp">Enviar por WhatsApp</button>
                 </div>
             </div>
         </div>
@@ -186,16 +250,19 @@ function showCheckout() {
     modal.id = 'checkout-modal';
     document.body.appendChild(modal);
 
-    // Validación de solo números en teléfono
     const telefonoInput = document.getElementById('cliente-telefono');
-    telefonoInput.addEventListener('input', function() {
+
+    telefonoInput.addEventListener('input', function () {
         this.value = this.value.replace(/[^0-9]/g, '');
     });
 }
 
 function closeCheckout() {
     const modal = document.getElementById('checkout-modal');
-    if (modal) modal.remove();
+
+    if (modal) {
+        modal.remove();
+    }
 }
 
 function confirmOrder() {
@@ -203,19 +270,30 @@ function confirmOrder() {
     const telefono = document.getElementById('cliente-telefono').value.trim();
     const direccion = document.getElementById('cliente-direccion').value.trim();
 
-    if (!nombre) return alert("Por favor ingresa tu nombre");
-    if (!telefono || telefono.length < 10) return alert("Por favor ingresa un teléfono válido (10 dígitos)");
-    
+    if (!nombre) {
+        return alert("Por favor ingresa tu nombre");
+    }
+
+    if (!telefono || telefono.length < 10) {
+        return alert("Por favor ingresa un teléfono válido de 10 dígitos");
+    }
+
     let mensaje = `🚀 *Nuevo Pedido - Strike Motards*%0A%0A`;
     mensaje += `*Cliente:* ${nombre}%0A`;
     mensaje += `*Teléfono:* ${telefono}%0A`;
-    if (direccion) mensaje += `*Dirección:* ${direccion}%0A%0A`;
+
+    if (direccion) {
+        mensaje += `*Dirección:* ${direccion}%0A%0A`;
+    }
 
     let total = 0;
+
     cart.forEach(p => {
         const qty = p.quantity || 1;
-        mensaje += `• ${qty}x ${p.nombre} - $${p.precio}%0A`;
-        total += parseFloat(p.precio) * qty;
+        const subtotal = parseFloat(p.precio) * qty;
+
+        mensaje += `• ${qty}x ${p.nombre} - $${subtotal.toLocaleString('es-MX')} MXN%0A`;
+        total += subtotal;
     });
 
     mensaje += `%0A*Total:* $${total.toLocaleString('es-MX')} MXN`;
@@ -226,17 +304,43 @@ function confirmOrder() {
     closeCheckout();
     cart = [];
     updateCartCount();
-    toggleCart();
+
+    const cartModal = document.getElementById('cart-modal');
+    cartModal.style.display = 'none';
+
+    showToast("Pedido enviado por WhatsApp");
+}
+
+// ==================== TOAST ====================
+function showToast(message) {
+    const oldToast = document.querySelector('.toast');
+
+    if (oldToast) {
+        oldToast.remove();
+    }
+
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 1800);
+}
+
+// ==================== SECCIONES ====================
+function mostrarSeccion(id) {
+    document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+
+    if (id === 'tienda') {
+        cargarProductos();
+    }
 }
 
 // ==================== INICIALIZACIÓN ====================
 document.addEventListener('DOMContentLoaded', () => {
-    const exploreBtn = document.querySelector('#inicio button');
-    if (exploreBtn) exploreBtn.addEventListener('click', () => mostrarSeccion('tienda'));
+    updateCartCount();
 });
-
-function mostrarSeccion(id) {
-    document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
-    if (id === 'tienda') cargarProductos();
-}
