@@ -113,23 +113,45 @@
     </div>
 </nav>
 
-<!-- CARRITO -->
-<div id="cart-modal" style="display: none; position: fixed; right: 0; top: 0; width: 420px; height: 100%; background: #062D38; z-index: 2000; overflow-y: auto; padding: 25px; box-shadow: -10px 0 30px rgba(0,0,0,0.6);">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h2>Tu Equipo</h2>
-        <button onclick="toggleCart()" style="background:none; border:none; color:white; font-size:28px; cursor:pointer;">✕</button>
-    </div>
-    
-    <div id="cart-list" style="margin: 20px 0;"></div>
-    
-    <div style="border-top: 1px solid #1a4d5c; padding-top: 20px;">
-        <div style="display: flex; justify-content: space-between; font-size: 1.3rem;">
-            <strong>Total:</strong>
-            <strong style="color: var(--accent);">$<span id="cart-total">0.00</span></strong>
+<!-- CARRITO ESTILO FIGMA -->
+<div id="cart-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); z-index: 2000; align-items: center; justify-content: center;">
+    <div style="background: #062D38; width: 95%; max-width: 1100px; height: 85vh; border-radius: 16px; display: flex; overflow: hidden;">
+        
+        <!-- Izquierda: Lista de productos -->
+        <div style="flex: 2; padding: 30px; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <h2>Carrito de Compras</h2>
+                <button onclick="toggleCart()" style="background:none; border:none; color:white; font-size:30px; cursor:pointer;">✕</button>
+            </div>
+            <div id="cart-list"></div>
         </div>
-        <button onclick="showCheckout()" style="width:100%; margin-top:20px; padding:16px; background:var(--accent); border:none; color:white; font-weight:700; border-radius:12px;">
-            FINALIZAR POR WHATSAPP
-        </button>
+
+        <!-- Derecha: Resumen -->
+        <div style="flex: 1; background: #0A3D4A; padding: 30px; display: flex; flex-direction: column;">
+            <h2>Resumen del Pedido</h2>
+            
+            <div style="margin-top: 40px; flex-grow: 1;">
+                <div style="display:flex; justify-content:space-between; margin:15px 0;">
+                    <span>Subtotal</span>
+                    <span id="subtotal">$0</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin:15px 0;">
+                    <span>Envío</span>
+                    <span style="color:#00ff9d;">Gratis</span>
+                </div>
+            </div>
+
+            <div style="border-top:2px solid #1a4d5c; padding-top:20px;">
+                <div style="display:flex; justify-content:space-between; font-size:1.5rem; font-weight:700;">
+                    <span>Total</span>
+                    <span id="cart-total" style="color:var(--accent);">$0</span>
+                </div>
+            </div>
+
+            <button onclick="showCheckout()" style="width:100%; margin-top:30px; padding:16px; background:var(--accent); border:none; color:white; font-weight:700; border-radius:12px; font-size:1.1rem;">
+                Proceder al Pago
+            </button>
+        </div>
     </div>
 </div>
 
