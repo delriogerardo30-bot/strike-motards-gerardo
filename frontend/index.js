@@ -337,6 +337,18 @@ function mostrarSeccion(id) {
 
     if (id === 'tienda') {
         cargarProductos();
+
+        setTimeout(() => {
+            document.getElementById('tienda').scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }, 100);
+    } else {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
     }
 }
 
