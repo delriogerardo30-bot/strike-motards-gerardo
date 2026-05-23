@@ -19,7 +19,7 @@ async function cargarProductos() {
     }
 }
 
-// ==================== FILTROS Y BÚSQUEDA (sin cambios) ====================
+// ==================== FILTROS Y BÚSQUEDA ====================
 function renderFilters() {
     const categories = ['Todos', ...new Set(allProducts.map(p => p.categoria))];
     const container = document.getElementById('category-filters');
@@ -79,7 +79,7 @@ function renderProducts(productos) {
     `).join('');
 }
 
-// ==================== CARRITO MEJORADO (Estilo Figma) ====================
+// ==================== CARRITO MEJORADO ====================
 function addToCart(id) {
     const product = allProducts.find(p => p.id === id);
     if (!product) return;
@@ -120,21 +120,19 @@ function renderCart() {
                 <img src="${item.imagen_url}" alt="${item.nombre}" style="width:70px; height:70px; object-fit:cover; border-radius:8px;">
                 <div style="flex:1; margin-left:15px;">
                     <p style="margin:0; font-weight:600;">${item.nombre}</p>
-                    <p style="margin:4px 0 0; color:#aaa; font-size:0.95rem;">$${parseFloat(item.precio).toLocaleString('es-MX')}</p>
+                    <p style="margin:4px 0 0; color:#aaa;">$${parseFloat(item.precio).toLocaleString('es-MX')}</p>
                 </div>
-                <div class="quantity-controls">
-                    <button class="quantity-btn" onclick="changeQuantity(${index}, -1)">–</button>
-                    <span style="min-width:30px; text-align:center; font-weight:600;">${qty}</span>
-                    <button class="quantity-btn" onclick="changeQuantity(${index}, 1)">+</button>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <button onclick="changeQuantity(${index}, -1)" style="width:28px;height:28px;background:#1a4d5c;color:white;border:none;border-radius:6px;cursor:pointer;">–</button>
+                    <span style="min-width:24px;text-align:center;">${qty}</span>
+                    <button onclick="changeQuantity(${index}, 1)" style="width:28px;height:28px;background:#1a4d5c;color:white;border:none;border-radius:6px;cursor:pointer;">+</button>
                 </div>
-                <button onclick="removeFromCart(${index})" style="background:none; border:none; color:#ff6b6b; font-size:1.6rem; cursor:pointer; margin-left:15px;">×</button>
+                <button onclick="removeFromCart(${index})" style="background:none;border:none;color:#ff6b6b;font-size:1.5rem;cursor:pointer;margin-left:10px;">×</button>
             </div>
         `;
     });
 
-    list.innerHTML = html || '<p style="text-align:center; color:#777; padding:80px 0;">Tu carrito está vacío</p>';
-    
-    // Actualizar total en el resumen
+    list.innerHTML = html || '<p style="text-align:center; color:#777; padding:60px 0;">Tu carrito está vacío</p>';
     document.getElementById('cart-total').textContent = total.toLocaleString('es-MX');
 }
 
@@ -151,25 +149,73 @@ function removeFromCart(index) {
     updateCartCount();
 }
 
-function clearCart() {
-    cart = [];
-    renderCart();
-    updateCartCount();
-    toggleCart();
-}
-
 // ==================== CHECKOUT ====================
 function showCheckout() {
     if (cart.length === 0) return alert("El carrito está vacío");
-    // Aquí puedes mantener o mejorar el modal de datos
-    alert("Funcionalidad de checkout en desarrollo. Por ahora usa WhatsApp.");
-    // toggleCart();
+
+    const total = cart.reduce((sum, item) => sum + parseFloat(item.precio) * (item.quantity || 1), 0);
+
+    const checkoutHTML = `
+        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:3000; display:flex; align-items:center; justify-content:center;">
+            <div style="background:#062D38; padding:30px; border-radius:16px; width:90%; max-width:500px;">
+                <h2 style="text-align:center; margin-bottom:20px;">Completa tu Pedido</h2>
+                
+                <input type="text" id="cliente-nombre" placeholder="Nombre completo *" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white;">
+                <input type="tel" id="cliente-telefono" placeholder="Teléfono / WhatsApp *" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white;">
+                <textarea id="cliente-direccion" placeholder="Dirección completa" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white; min-height:80px;"></textarea>
+                
+                <div style="margin:20px 0; padding:15px; background:#0A3D4A; border-radius:8px;">
+                    <p><strong>Total: $${total.toLocaleString('es-MX')} MXN</strong></p>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button onclick="closeCheckout()" style="flex:1; padding:14px; background:#444; border:none; border-radius:8px; color:white;">Cancelar</button>
+                    <button onclick="confirmOrder()" style="flex:1; padding:14px; background:var(--accent); border:none; border-radius:8px; color:white; font-weight:700;">Enviar por WhatsApp</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const modal = document.createElement('div');
+    modal.innerHTML = checkoutHTML;
+    modal.id = 'checkout-modal';
+    document.body.appendChild(modal);
 }
 
-function toggleCart() {
-    const modal = document.getElementById('cart-modal');
-    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
-    if (modal.style.display === 'flex') renderCart();
+function closeCheckout() {
+    const modal = document.getElementById('checkout-modal');
+    if (modal) modal.remove();
+}
+
+function confirmOrder() {
+    const nombre = document.getElementById('cliente-nombre').value.trim();
+    const telefono = document.getElementById('cliente-telefono').value.trim();
+
+    if (!nombre || !telefono) {
+        alert("Por favor completa nombre y teléfono");
+        return;
+    }
+
+    let mensaje = `🚀 *Nuevo Pedido - Strike Motards*%0A%0A`;
+    mensaje += `*Cliente:* ${nombre}%0A`;
+    mensaje += `*Teléfono:* ${telefono}%0A%0A`;
+
+    let total = 0;
+    cart.forEach(p => {
+        const qty = p.quantity || 1;
+        mensaje += `• ${qty}x ${p.nombre} - $${p.precio}%0A`;
+        total += parseFloat(p.precio) * qty;
+    });
+
+    mensaje += `%0A*Total:* $${total.toLocaleString('es-MX')} MXN`;
+
+    const url = `https://wa.me/527292529554?text=${mensaje}`;
+    window.open(url, "_blank");
+
+    closeCheckout();
+    cart = [];
+    updateCartCount();
+    toggleCart();
 }
 
 // ==================== INICIALIZACIÓN ====================
@@ -182,4 +228,10 @@ function mostrarSeccion(id) {
     document.querySelectorAll('.seccion').forEach(sec => sec.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     if (id === 'tienda') cargarProductos();
+}
+
+function toggleCart() {
+    const modal = document.getElementById('cart-modal');
+    modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+    if (modal.style.display === 'flex') renderCart();
 }
