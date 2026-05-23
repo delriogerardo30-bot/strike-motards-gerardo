@@ -19,7 +19,7 @@ async function cargarProductos() {
     }
 }
 
-// ==================== FILTROS ====================
+// ==================== FILTROS Y BÚSQUEDA ====================
 function renderFilters() {
     const categories = ['Todos', ...new Set(allProducts.map(p => p.categoria))];
     const container = document.getElementById('category-filters');
@@ -47,7 +47,10 @@ function filterProducts() {
 
     let filtered = allProducts;
 
-    if (activeCategory !== 'Todos') filtered = filtered.filter(p => p.categoria === activeCategory);
+    if (activeCategory !== 'Todos') {
+        filtered = filtered.filter(p => p.categoria === activeCategory);
+    }
+
     if (searchTerm) {
         filtered = filtered.filter(p => 
             p.nombre.toLowerCase().includes(searchTerm) || 
@@ -130,7 +133,6 @@ function renderCart() {
 
     list.innerHTML = html || '<p style="text-align:center; color:#777; padding:80px 0;">Tu carrito está vacío</p>';
     document.getElementById('cart-total').textContent = total.toLocaleString('es-MX');
-    document.getElementById('subtotal').textContent = total.toLocaleString('es-MX');
 }
 
 function changeQuantity(index, change) {
@@ -152,22 +154,76 @@ function toggleCart() {
     if (modal.style.display === 'flex') renderCart();
 }
 
-// ==================== CHECKOUT ====================
+// ==================== CHECKOUT CON VALIDACIÓN ====================
 function showCheckout() {
     if (cart.length === 0) return alert("El carrito está vacío");
 
     const total = cart.reduce((sum, item) => sum + parseFloat(item.precio) * (item.quantity || 1), 0);
 
+    const checkoutHTML = `
+        <div style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.92); z-index:3000; display:flex; align-items:center; justify-content:center;">
+            <div style="background:#062D38; padding:30px; border-radius:16px; width:90%; max-width:500px;">
+                <h2 style="text-align:center; margin-bottom:20px;">Completa tu Pedido</h2>
+                
+                <input type="text" id="cliente-nombre" placeholder="Nombre completo *" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white;">
+                <input type="tel" id="cliente-telefono" placeholder="Teléfono / WhatsApp *" maxlength="10" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white;">
+                <textarea id="cliente-direccion" placeholder="Dirección de envío (calle, colonia, ciudad, CP)" style="width:100%; padding:12px; margin:8px 0; background:#0A3D4A; border:none; border-radius:8px; color:white; min-height:80px;"></textarea>
+                
+                <div style="margin:20px 0; padding:15px; background:#0A3D4A; border-radius:8px;">
+                    <p><strong>Total: $${total.toLocaleString('es-MX')} MXN</strong></p>
+                </div>
+
+                <div style="display:flex; gap:10px;">
+                    <button onclick="closeCheckout()" style="flex:1; padding:14px; background:#444; border:none; border-radius:8px; color:white;">Cancelar</button>
+                    <button onclick="confirmOrder()" style="flex:1; padding:14px; background:var(--accent); border:none; border-radius:8px; color:white; font-weight:700;">Enviar por WhatsApp</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const modal = document.createElement('div');
+    modal.innerHTML = checkoutHTML;
+    modal.id = 'checkout-modal';
+    document.body.appendChild(modal);
+
+    // Validación de solo números en teléfono
+    const telefonoInput = document.getElementById('cliente-telefono');
+    telefonoInput.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+    });
+}
+
+function closeCheckout() {
+    const modal = document.getElementById('checkout-modal');
+    if (modal) modal.remove();
+}
+
+function confirmOrder() {
+    const nombre = document.getElementById('cliente-nombre').value.trim();
+    const telefono = document.getElementById('cliente-telefono').value.trim();
+    const direccion = document.getElementById('cliente-direccion').value.trim();
+
+    if (!nombre) return alert("Por favor ingresa tu nombre");
+    if (!telefono || telefono.length < 10) return alert("Por favor ingresa un teléfono válido (10 dígitos)");
+    
     let mensaje = `🚀 *Nuevo Pedido - Strike Motards*%0A%0A`;
+    mensaje += `*Cliente:* ${nombre}%0A`;
+    mensaje += `*Teléfono:* ${telefono}%0A`;
+    if (direccion) mensaje += `*Dirección:* ${direccion}%0A%0A`;
+
+    let total = 0;
     cart.forEach(p => {
         const qty = p.quantity || 1;
         mensaje += `• ${qty}x ${p.nombre} - $${p.precio}%0A`;
+        total += parseFloat(p.precio) * qty;
     });
+
     mensaje += `%0A*Total:* $${total.toLocaleString('es-MX')} MXN`;
 
     const url = `https://wa.me/527292529554?text=${mensaje}`;
     window.open(url, "_blank");
 
+    closeCheckout();
     cart = [];
     updateCartCount();
     toggleCart();
