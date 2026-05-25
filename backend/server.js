@@ -43,9 +43,14 @@ const Producto = sequelize.define('Producto', {
     type: DataTypes.TEXT,
     defaultValue: 'https://via.placeholder.com/300'
   },
-  categoria: { // Añadí categoría para que coincida con tu diseño de Figma
+  categoria: {
     type: DataTypes.STRING,
     defaultValue: 'Accesorios'
+  },
+  stock: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
   }
 }, {
   tableName: 'productos',
@@ -55,7 +60,7 @@ const Producto = sequelize.define('Producto', {
 /* =========================
    SINCRONIZACIÓN
 ========================= */
-sequelize.sync({ alter: true }) 
+sequelize.sync({ alter: true })
   .then(() => console.log('✅ PostgreSQL conectado y tablas sincronizadas'))
   .catch(err => console.error('❌ Error de conexión:', err));
 
@@ -64,7 +69,10 @@ sequelize.sync({ alter: true })
 ========================= */
 app.get('/productos', async (req, res) => {
   try {
-    const productos = await Producto.findAll();
+    const productos = await Producto.findAll({
+      order: [['id', 'ASC']]
+    });
+
     res.json(productos);
   } catch (err) {
     console.error("Error al obtener productos:", err);
@@ -74,7 +82,7 @@ app.get('/productos', async (req, res) => {
 
 // Ruta de prueba para saber si el server está vivo en Render
 app.get('/', (req, res) => {
-    res.send('API de Strike Motards funcionando 🚀');
+  res.send('API de Strike Motards funcionando 🚀');
 });
 
 /* =========================

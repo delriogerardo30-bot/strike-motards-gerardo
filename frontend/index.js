@@ -3,7 +3,8 @@ let allProducts = [];
 let productsLoaded = false;
 
 // API del backend.
-// Si no carga el backend, el proyecto seguirá funcionando con productos de respaldo.
+// Si estás en local usa localhost.
+// Si estás en Render usa tu backend online.
 const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
     ? "http://localhost:3000"
     : "https://backend-strike-motards.onrender.com";
@@ -14,6 +15,7 @@ const fallbackProducts = [
         nombre: "Casco Integral Strike Pro",
         categoria: "Cascos",
         precio: 2499,
+        stock: 8,
         imagen_url: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?q=80&w=1200&auto=format&fit=crop",
         descripcion: "Casco integral con diseño deportivo para motociclistas."
     },
@@ -22,6 +24,7 @@ const fallbackProducts = [
         nombre: "Casco Abatible Urban",
         categoria: "Cascos",
         precio: 2199,
+        stock: 10,
         imagen_url: "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?q=80&w=1200&auto=format&fit=crop",
         descripcion: "Casco abatible cómodo para ciudad y carretera."
     },
@@ -30,6 +33,7 @@ const fallbackProducts = [
         nombre: "Chamarra Motard Negra",
         categoria: "Ropa",
         precio: 1899,
+        stock: 7,
         imagen_url: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1200&auto=format&fit=crop",
         descripcion: "Chamarra resistente con estilo urbano premium."
     },
@@ -38,6 +42,7 @@ const fallbackProducts = [
         nombre: "Playera Strike Motards",
         categoria: "Ropa",
         precio: 399,
+        stock: 14,
         imagen_url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1200&auto=format&fit=crop",
         descripcion: "Playera casual para amantes de las motocicletas."
     },
@@ -46,6 +51,7 @@ const fallbackProducts = [
         nombre: "Guantes Racing",
         categoria: "Accesorios",
         precio: 699,
+        stock: 20,
         imagen_url: "https://images.unsplash.com/photo-1611241443322-78fd047e0e8b?q=80&w=1200&auto=format&fit=crop",
         descripcion: "Guantes cómodos con protección para conducción."
     },
@@ -54,6 +60,7 @@ const fallbackProducts = [
         nombre: "Mochila Impermeable",
         categoria: "Accesorios",
         precio: 899,
+        stock: 13,
         imagen_url: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1200&auto=format&fit=crop",
         descripcion: "Mochila resistente al agua para rutas largas."
     }
@@ -70,6 +77,10 @@ function escapeHTML(texto) {
 
 function getImage(producto) {
     return producto.imagen_url || producto.imagen || "https://via.placeholder.com/600x400?text=Strike+Motards";
+}
+
+function getStock(producto) {
+    return Number(producto.stock || 0);
 }
 
 // ==================== CARGAR PRODUCTOS ====================
@@ -131,7 +142,8 @@ function renderFilters() {
         .map(p => p.categoria || "Accesorios")
         .filter(Boolean);
 
-    const ordenBase = ["Todos", "Cascos", "Ropa", "Accesorios"];
+    const ordenBase = ["Todos", "Cascos", "Ropa", "Accesorios", "Calzado", "Tecnología"];
+
     const otrasCategorias = [...new Set(categoriasBackend)]
         .filter(cat => !ordenBase.includes(cat));
 
@@ -175,7 +187,7 @@ function filterProducts() {
 
     let filtered = [...allProducts];
 
-    // CORRECCIÓN DEL BUG DE "TODOS"
+    // FILTRO DE CATEGORÍAS
     if (activeCategory !== "Todos") {
 
         filtered = filtered.filter(p =>
@@ -183,6 +195,7 @@ function filterProducts() {
         );
     }
 
+    // FILTRO DE BÚSQUEDA
     if (searchTerm) {
 
         filtered = filtered.filter(p => {
@@ -254,6 +267,12 @@ function renderProducts(productos) {
         const imagen =
             escapeHTML(getImage(p));
 
+        const stock =
+            getStock(p);
+
+        const agotado =
+            stock <= 0;
+
         return `
             <div class="card">
 
@@ -277,6 +296,20 @@ function renderProducts(productos) {
                     <p>${descripcion}</p>
 
                     <div style="
+                        margin-top:12px;
+                        font-size:0.92rem;
+                        font-weight:700;
+                        color:${agotado ? '#ff5b5b' : '#00d084'};
+                    ">
+
+                        ${agotado
+                            ? '❌ Agotado'
+                            : `📦 Stock disponible: ${stock}`
+                        }
+
+                    </div>
+
+                    <div style="
                         display:flex;
                         justify-content:space-between;
                         align-items:center;
@@ -291,8 +324,15 @@ function renderProducts(productos) {
                         <button
                             class="btn-add"
                             onclick="addToCart(${id})"
+                            ${agotado ? 'disabled' : ''}
+                            style="
+                                ${agotado
+                                    ? 'opacity:0.5; cursor:not-allowed; background:#555;'
+                                    : ''
+                                }
+                            "
                         >
-                            Agregar
+                            ${agotado ? 'Agotado' : 'Agregar'}
                         </button>
 
                     </div>
@@ -312,12 +352,30 @@ function addToCart(id) {
 
     if (!product) return;
 
+    const stock =
+        getStock(product);
+
     const existing =
         cart.find(item => Number(item.id) === Number(id));
 
+    const cantidadActual =
+        existing ? existing.quantity || 1 : 0;
+
+    // VALIDAR STOCK
+    if (cantidadActual >= stock) {
+
+        showToast(`⚠️ Solo quedan ${stock} unidades disponibles`);
+
+        return;
+    }
+
     if (existing) {
-        existing.quantity = (existing.quantity || 1) + 1;
+
+        existing.quantity =
+            (existing.quantity || 1) + 1;
+
     } else {
+
         cart.push({
             ...product,
             quantity: 1
@@ -369,6 +427,9 @@ function renderCart() {
         const precio =
             Number(item.precio || 0);
 
+        const stock =
+            getStock(item);
+
         const itemTotal =
             precio * qty;
 
@@ -392,8 +453,19 @@ function renderCart() {
                         $${precio.toLocaleString("es-MX")} MXN
                     </p>
 
-                    <p style="color:var(--teal); font-size:0.9rem;">
-                        Subtotal: $${itemTotal.toLocaleString("es-MX")}
+                    <p style="
+                        color:#00d084;
+                        font-size:0.9rem;
+                    ">
+                        📦 Stock: ${stock}
+                    </p>
+
+                    <p style="
+                        color:var(--teal);
+                        font-size:0.9rem;
+                    ">
+                        Subtotal:
+                        $${itemTotal.toLocaleString("es-MX")}
                     </p>
 
                 </div>
@@ -460,8 +532,21 @@ function changeQuantity(index, change) {
 
     if (!cart[index]) return;
 
-    cart[index].quantity =
+    const stock =
+        getStock(cart[index]);
+
+    const nuevaCantidad =
         (cart[index].quantity || 1) + change;
+
+    // NO SUPERAR STOCK
+    if (nuevaCantidad > stock) {
+
+        showToast(`⚠️ Stock máximo: ${stock}`);
+
+        return;
+    }
+
+    cart[index].quantity = nuevaCantidad;
 
     if (cart[index].quantity < 1) {
         cart.splice(index, 1);
@@ -487,7 +572,9 @@ function toggleCart() {
     if (!modal) return;
 
     modal.style.display =
-        modal.style.display === "flex" ? "none" : "flex";
+        modal.style.display === "flex"
+            ? "none"
+            : "flex";
 
     if (modal.style.display === "flex") {
         renderCart();
@@ -658,7 +745,9 @@ function confirmOrder() {
     if (!valido) return;
 
     let mensaje =
-        "🚀 *Nuevo Pedido - Strike Motards*%0A%0A";
+        "🧾 *COMANDA DE PEDIDO - STRIKE MOTARDS*%0A";
+    mensaje +=
+        "━━━━━━━━━━━━━━━━━━━━%0A%0A";
 
     mensaje +=
         `*Cliente:* ${encodeURIComponent(nombre)}%0A`;
@@ -669,9 +758,12 @@ function confirmOrder() {
     mensaje +=
         `*Dirección:* ${encodeURIComponent(direccion)}%0A%0A`;
 
+    mensaje +=
+        "*PRODUCTOS:*%0A";
+
     let total = 0;
 
-    cart.forEach(p => {
+    cart.forEach((p, index) => {
 
         const qty =
             p.quantity || 1;
@@ -683,13 +775,31 @@ function confirmOrder() {
             precio * qty;
 
         mensaje +=
-            `• ${qty}x ${encodeURIComponent(p.nombre)} - $${subtotal.toLocaleString("es-MX")} MXN%0A`;
+            `%0A${index + 1}. ${encodeURIComponent(p.nombre)}%0A`;
+
+        mensaje +=
+            `   Cantidad: ${qty}%0A`;
+
+        mensaje +=
+            `   Precio unitario: $${precio.toLocaleString("es-MX")} MXN%0A`;
+
+        mensaje +=
+            `   Subtotal: $${subtotal.toLocaleString("es-MX")} MXN%0A`;
 
         total += subtotal;
     });
 
     mensaje +=
-        `%0A*Total:* $${total.toLocaleString("es-MX")} MXN`;
+        "%0A━━━━━━━━━━━━━━━━━━━━%0A";
+
+    mensaje +=
+        `*TOTAL:* $${total.toLocaleString("es-MX")} MXN%0A`;
+
+    mensaje +=
+        "━━━━━━━━━━━━━━━━━━━━%0A";
+
+    mensaje +=
+        "%0A_Estado: Pendiente de confirmación_";
 
     const url =
         `https://wa.me/527292529554?text=${mensaje}`;
