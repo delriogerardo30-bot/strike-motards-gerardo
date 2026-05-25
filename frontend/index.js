@@ -2,9 +2,7 @@ let cart = [];
 let allProducts = [];
 let productsLoaded = false;
 
-// API del backend.
-// Si estás en local usa localhost.
-// Si estás en Render usa tu backend online.
+// API backend
 const API_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
     ? "http://localhost:3000"
     : "https://backend-strike-motards.onrender.com";
@@ -36,33 +34,6 @@ const fallbackProducts = [
         stock: 7,
         imagen_url: "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=1200&auto=format&fit=crop",
         descripcion: "Chamarra resistente con estilo urbano premium."
-    },
-    {
-        id: 4,
-        nombre: "Playera Strike Motards",
-        categoria: "Ropa",
-        precio: 399,
-        stock: 14,
-        imagen_url: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=1200&auto=format&fit=crop",
-        descripcion: "Playera casual para amantes de las motocicletas."
-    },
-    {
-        id: 5,
-        nombre: "Guantes Racing",
-        categoria: "Accesorios",
-        precio: 699,
-        stock: 20,
-        imagen_url: "https://images.unsplash.com/photo-1611241443322-78fd047e0e8b?q=80&w=1200&auto=format&fit=crop",
-        descripcion: "Guantes cómodos con protección para conducción."
-    },
-    {
-        id: 6,
-        nombre: "Mochila Impermeable",
-        categoria: "Accesorios",
-        precio: 899,
-        stock: 13,
-        imagen_url: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=1200&auto=format&fit=crop",
-        descripcion: "Mochila resistente al agua para rutas largas."
     }
 ];
 
@@ -86,7 +57,9 @@ function getStock(producto) {
 // ==================== CARGAR PRODUCTOS ====================
 
 async function cargarProductos() {
-    const container = document.getElementById("lista-productos");
+
+    const container =
+        document.getElementById("lista-productos");
 
     if (!container) return;
 
@@ -96,22 +69,30 @@ async function cargarProductos() {
     }
 
     try {
+
         container.innerHTML = `
-            <p style="text-align:center; padding:60px; color:#aaa; grid-column:1/-1;">
+            <p style="
+                text-align:center;
+                padding:60px;
+                color:#aaa;
+                grid-column:1/-1;
+            ">
                 Cargando productos...
             </p>
         `;
 
-        const res = await fetch(`${API_URL}/productos`);
+        const res =
+            await fetch(`${API_URL}/productos`);
 
         if (!res.ok) {
             throw new Error("No se pudo conectar con el servidor");
         }
 
-        const data = await res.json();
+        const data =
+            await res.json();
 
         if (!Array.isArray(data) || data.length === 0) {
-            throw new Error("La respuesta del servidor no contiene productos");
+            throw new Error("No hay productos");
         }
 
         allProducts = data;
@@ -119,8 +100,10 @@ async function cargarProductos() {
 
         renderFilters();
         filterProducts();
+
     } catch (error) {
-        console.warn("No se pudieron cargar productos del backend. Se usarán productos de respaldo.", error);
+
+        console.warn("Modo local activado", error);
 
         allProducts = fallbackProducts;
         productsLoaded = true;
@@ -133,88 +116,105 @@ async function cargarProductos() {
 }// ==================== FILTROS Y BÚSQUEDA ====================
 
 function renderFilters() {
-    const container = document.getElementById("category-filters");
-    const searchInput = document.getElementById("search-input");
+
+    const container =
+        document.getElementById("category-filters");
+
+    const searchInput =
+        document.getElementById("search-input");
 
     if (!container || !searchInput) return;
 
-    const categoriasBackend = allProducts
-        .map(p => p.categoria || "Accesorios")
-        .filter(Boolean);
+    const categoriasBackend =
+        allProducts
+            .map(p => p.categoria || "Accesorios")
+            .filter(Boolean);
 
-    const ordenBase = ["Todos", "Cascos", "Ropa", "Accesorios", "Calzado", "Tecnología"];
+    const ordenBase =
+        ["Todos", "Cascos", "Ropa", "Accesorios", "Calzado", "Tecnología"];
 
-    const otrasCategorias = [...new Set(categoriasBackend)]
-        .filter(cat => !ordenBase.includes(cat));
+    const otrasCategorias =
+        [...new Set(categoriasBackend)]
+            .filter(cat => !ordenBase.includes(cat));
 
-    const categories = [...ordenBase, ...otrasCategorias];
+    const categories =
+        [...ordenBase, ...otrasCategorias];
 
-    container.innerHTML = categories.map(cat => `
-        <div class="category-chip ${cat === "Todos" ? "active" : ""}" data-category="${escapeHTML(cat)}">
-            ${escapeHTML(cat)}
-        </div>
-    `).join("");
+    container.innerHTML =
+        categories.map(cat => `
+            <div
+                class="category-chip ${cat === "Todos" ? "active" : ""}"
+                data-category="${escapeHTML(cat)}"
+            >
+                ${escapeHTML(cat)}
+            </div>
+        `).join("");
 
-    container.querySelectorAll(".category-chip").forEach(chip => {
+    container
+        .querySelectorAll(".category-chip")
+        .forEach(chip => {
 
-        chip.addEventListener("click", () => {
+            chip.addEventListener("click", () => {
 
-            container.querySelectorAll(".category-chip")
-                .forEach(c => c.classList.remove("active"));
+                container
+                    .querySelectorAll(".category-chip")
+                    .forEach(c => c.classList.remove("active"));
 
-            chip.classList.add("active");
+                chip.classList.add("active");
 
-            filterProducts();
+                filterProducts();
+            });
+
         });
-
-    });
 
     searchInput.addEventListener("input", filterProducts);
 }
 
 function filterProducts() {
 
-    const searchInput = document.getElementById("search-input");
+    const searchInput =
+        document.getElementById("search-input");
 
     const activeCategory =
         document.querySelector(".category-chip.active")
-        ?.dataset.category || "Todos";
+            ?.dataset.category || "Todos";
 
     const searchTerm =
         (searchInput?.value || "")
-        .toLowerCase()
-        .trim();
+            .toLowerCase()
+            .trim();
 
-    let filtered = [...allProducts];
+    let filtered =
+        [...allProducts];
 
-    // FILTRO DE CATEGORÍAS
     if (activeCategory !== "Todos") {
 
-        filtered = filtered.filter(p =>
-            (p.categoria || "Accesorios") === activeCategory
-        );
+        filtered =
+            filtered.filter(p =>
+                (p.categoria || "Accesorios") === activeCategory
+            );
     }
 
-    // FILTRO DE BÚSQUEDA
     if (searchTerm) {
 
-        filtered = filtered.filter(p => {
+        filtered =
+            filtered.filter(p => {
 
-            const nombre =
-                (p.nombre || "").toLowerCase();
+                const nombre =
+                    (p.nombre || "").toLowerCase();
 
-            const descripcion =
-                (p.descripcion || "").toLowerCase();
+                const descripcion =
+                    (p.descripcion || "").toLowerCase();
 
-            const categoria =
-                (p.categoria || "").toLowerCase();
+                const categoria =
+                    (p.categoria || "").toLowerCase();
 
-            return (
-                nombre.includes(searchTerm) ||
-                descripcion.includes(searchTerm) ||
-                categoria.includes(searchTerm)
-            );
-        });
+                return (
+                    nombre.includes(searchTerm) ||
+                    descripcion.includes(searchTerm) ||
+                    categoria.includes(searchTerm)
+                );
+            });
     }
 
     renderProducts(filtered);
@@ -245,104 +245,98 @@ function renderProducts(productos) {
         return;
     }
 
-    container.innerHTML = productos.map(p => {
+    container.innerHTML =
+        productos.map(p => {
 
-        const id = Number(p.id);
+            const id =
+                Number(p.id);
 
-        const nombre =
-            escapeHTML(p.nombre || "Producto");
+            const nombre =
+                escapeHTML(p.nombre || "Producto");
 
-        const categoria =
-            escapeHTML(p.categoria || "Accesorios");
+            const categoria =
+                escapeHTML(p.categoria || "Accesorios");
 
-        const descripcion =
-            escapeHTML(
-                p.descripcion ||
-                "Producto premium para motociclistas."
-            );
+            const descripcion =
+                escapeHTML(
+                    p.descripcion ||
+                    "Producto premium para motociclistas."
+                );
 
-        const precio =
-            Number(p.precio || 0);
+            const precio =
+                Number(p.precio || 0);
 
-        const imagen =
-            escapeHTML(getImage(p));
+            const imagen =
+                escapeHTML(getImage(p));
 
-        const stock =
-            getStock(p);
+            const stock =
+                getStock(p);
 
-        const agotado =
-            stock <= 0;
+            const agotado =
+                stock <= 0;
 
-        return `
-            <div class="card">
+            return `
+                <div class="card">
 
-                <div class="card-img-wrap">
-
-                    <img
-                        src="${imagen}"
-                        alt="${nombre}"
-                    >
-
-                </div>
-
-                <div class="card-content">
-
-                    <span class="category-badge">
-                        ${categoria}
-                    </span>
-
-                    <h3>${nombre}</h3>
-
-                    <p>${descripcion}</p>
-
-                    <div style="
-                        margin-top:12px;
-                        font-size:0.92rem;
-                        font-weight:700;
-                        color:${agotado ? '#ff5b5b' : '#00d084'};
-                    ">
-
-                        ${agotado
-                            ? '❌ Agotado'
-                            : `📦 Stock disponible: ${stock}`
-                        }
-
+                    <div class="card-img-wrap">
+                        <img src="${imagen}" alt="${nombre}">
                     </div>
 
-                    <div style="
-                        display:flex;
-                        justify-content:space-between;
-                        align-items:center;
-                        margin-top:18px;
-                        gap:12px;
-                    ">
+                    <div class="card-content">
 
-                        <span class="price">
-                            $${precio.toLocaleString("es-MX")}
+                        <span class="category-badge">
+                            ${categoria}
                         </span>
 
-                        <button
-                            class="btn-add"
-                            onclick="addToCart(${id})"
-                            ${agotado ? 'disabled' : ''}
-                            style="
-                                ${agotado
-                                    ? 'opacity:0.5; cursor:not-allowed; background:#555;'
-                                    : ''
-                                }
-                            "
-                        >
-                            ${agotado ? 'Agotado' : 'Agregar'}
-                        </button>
+                        <h3>${nombre}</h3>
+
+                        <p>${descripcion}</p>
+
+                        <div style="
+                            margin-top:12px;
+                            font-size:0.92rem;
+                            font-weight:700;
+                            color:${agotado ? '#ff5b5b' : '#00d084'};
+                        ">
+                            ${agotado
+                                ? '❌ Agotado'
+                                : `📦 Stock disponible: ${stock}`
+                            }
+                        </div>
+
+                        <div style="
+                            display:flex;
+                            justify-content:space-between;
+                            align-items:center;
+                            margin-top:18px;
+                            gap:12px;
+                        ">
+
+                            <span class="price">
+                                $${precio.toLocaleString("es-MX")}
+                            </span>
+
+                            <button
+                                class="btn-add"
+                                onclick="addToCart(${id})"
+                                ${agotado ? "disabled" : ""}
+                                style="
+                                    ${agotado
+                                        ? "opacity:0.5; cursor:not-allowed; background:#555;"
+                                        : ""
+                                    }
+                                "
+                            >
+                                ${agotado ? "Agotado" : "Agregar"}
+                            </button>
+
+                        </div>
 
                     </div>
 
                 </div>
-
-            </div>
-        `;
-
-    }).join("");
+            `;
+        }).join("");
 }// ==================== CARRITO ====================
 
 function addToCart(id) {
@@ -361,11 +355,9 @@ function addToCart(id) {
     const cantidadActual =
         existing ? existing.quantity || 1 : 0;
 
-    // VALIDAR STOCK
     if (cantidadActual >= stock) {
 
         showToast(`⚠️ Solo quedan ${stock} unidades disponibles`);
-
         return;
     }
 
@@ -453,17 +445,11 @@ function renderCart() {
                         $${precio.toLocaleString("es-MX")} MXN
                     </p>
 
-                    <p style="
-                        color:#00d084;
-                        font-size:0.9rem;
-                    ">
+                    <p style="color:#00d084; font-size:0.9rem;">
                         📦 Stock: ${stock}
                     </p>
 
-                    <p style="
-                        color:var(--teal);
-                        font-size:0.9rem;
-                    ">
+                    <p style="color:var(--teal); font-size:0.9rem;">
                         Subtotal:
                         $${itemTotal.toLocaleString("es-MX")}
                     </p>
@@ -538,11 +524,9 @@ function changeQuantity(index, change) {
     const nuevaCantidad =
         (cart[index].quantity || 1) + change;
 
-    // NO SUPERAR STOCK
     if (nuevaCantidad > stock) {
 
         showToast(`⚠️ Stock máximo: ${stock}`);
-
         return;
     }
 
@@ -656,7 +640,9 @@ function showCheckout() {
         </div>
     `;
 
-    const modal = document.createElement("div");
+    const modal =
+        document.createElement("div");
+
     modal.innerHTML = checkoutHTML;
     modal.id = "checkout-modal";
 
@@ -703,7 +689,7 @@ function setCheckoutError(inputId, errorId) {
         ?.classList.add("show");
 }
 
-function confirmOrder() {
+async function confirmOrder() {
 
     const nombreInput =
         document.getElementById("cliente-nombre");
@@ -744,83 +730,123 @@ function confirmOrder() {
 
     if (!valido) return;
 
-    let mensaje =
-        "🧾 *COMANDA DE PEDIDO - STRIKE MOTARDS*%0A";
-    mensaje +=
-        "━━━━━━━━━━━━━━━━━━━━%0A%0A";
+    try {
 
-    mensaje +=
-        `*Cliente:* ${encodeURIComponent(nombre)}%0A`;
+        const respuesta =
+            await fetch(`${API_URL}/pedidos`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    nombre,
+                    telefono,
+                    direccion,
+                    productos: cart.map(item => ({
+                        id: item.id,
+                        cantidad: item.quantity || 1
+                    }))
+                })
+            });
 
-    mensaje +=
-        `*Teléfono:* ${encodeURIComponent(telefono)}%0A`;
+        const resultado =
+            await respuesta.json();
 
-    mensaje +=
-        `*Dirección:* ${encodeURIComponent(direccion)}%0A%0A`;
+        if (!respuesta.ok) {
+            alert(resultado.error || "No se pudo registrar el pedido");
+            return;
+        }
 
-    mensaje +=
-        "*PRODUCTOS:*%0A";
-
-    let total = 0;
-
-    cart.forEach((p, index) => {
-
-        const qty =
-            p.quantity || 1;
-
-        const precio =
-            Number(p.precio || 0);
-
-        const subtotal =
-            precio * qty;
+        let mensaje =
+            "🧾 *COMANDA DE PEDIDO - STRIKE MOTARDS*%0A";
+        mensaje +=
+            "━━━━━━━━━━━━━━━━━━━━%0A%0A";
 
         mensaje +=
-            `%0A${index + 1}. ${encodeURIComponent(p.nombre)}%0A`;
+            `*Pedido:* #${resultado.pedido_id}%0A`;
 
         mensaje +=
-            `   Cantidad: ${qty}%0A`;
+            `*Cliente:* ${encodeURIComponent(nombre)}%0A`;
 
         mensaje +=
-            `   Precio unitario: $${precio.toLocaleString("es-MX")} MXN%0A`;
+            `*Teléfono:* ${encodeURIComponent(telefono)}%0A`;
 
         mensaje +=
-            `   Subtotal: $${subtotal.toLocaleString("es-MX")} MXN%0A`;
+            `*Dirección:* ${encodeURIComponent(direccion)}%0A%0A`;
 
-        total += subtotal;
-    });
+        mensaje +=
+            "*PRODUCTOS:*%0A";
 
-    mensaje +=
-        "%0A━━━━━━━━━━━━━━━━━━━━%0A";
+        let total = 0;
 
-    mensaje +=
-        `*TOTAL:* $${total.toLocaleString("es-MX")} MXN%0A`;
+        cart.forEach((p, index) => {
 
-    mensaje +=
-        "━━━━━━━━━━━━━━━━━━━━%0A";
+            const qty =
+                p.quantity || 1;
 
-    mensaje +=
-        "%0A_Estado: Pendiente de confirmación_";
+            const precio =
+                Number(p.precio || 0);
 
-    const url =
-        `https://wa.me/527292529554?text=${mensaje}`;
+            const subtotal =
+                precio * qty;
 
-    window.open(url, "_blank");
+            mensaje +=
+                `%0A${index + 1}. ${encodeURIComponent(p.nombre)}%0A`;
 
-    closeCheckout();
+            mensaje +=
+                `   Cantidad: ${qty}%0A`;
 
-    cart = [];
+            mensaje +=
+                `   Precio unitario: $${precio.toLocaleString("es-MX")} MXN%0A`;
 
-    updateCartCount();
-    renderCart();
+            mensaje +=
+                `   Subtotal: $${subtotal.toLocaleString("es-MX")} MXN%0A`;
 
-    const cartModal =
-        document.getElementById("cart-modal");
+            total += subtotal;
+        });
 
-    if (cartModal) {
-        cartModal.style.display = "none";
+        mensaje +=
+            "%0A━━━━━━━━━━━━━━━━━━━━%0A";
+
+        mensaje +=
+            `*TOTAL:* $${total.toLocaleString("es-MX")} MXN%0A`;
+
+        mensaje +=
+            "━━━━━━━━━━━━━━━━━━━━%0A";
+
+        mensaje +=
+            "%0A_Estado: Pendiente de confirmación_";
+
+        const url =
+            `https://wa.me/527292529554?text=${mensaje}`;
+
+        window.open(url, "_blank");
+
+        closeCheckout();
+
+        cart = [];
+
+        updateCartCount();
+        renderCart();
+
+        const cartModal =
+            document.getElementById("cart-modal");
+
+        if (cartModal) {
+            cartModal.style.display = "none";
+        }
+
+        productsLoaded = false;
+        await cargarProductos();
+
+        showToast("Pedido registrado y enviado por WhatsApp");
+
+    } catch (error) {
+
+        console.error("Error al registrar pedido:", error);
+
+        alert("Ocurrió un error al registrar el pedido. Intenta de nuevo.");
     }
-
-    showToast("Pedido enviado por WhatsApp");
 }
 
 // ==================== TOAST ====================
