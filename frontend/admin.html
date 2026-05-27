@@ -86,7 +86,6 @@ PANEL
     padding:30px;
     border-radius:10px;
     margin-bottom:20px;
-
     display:flex;
     justify-content:space-between;
     align-items:center;
@@ -118,13 +117,13 @@ PANEL
     font-size:55px;
     font-weight:bold;
 }/* =========================
-GESTION PRODUCTOS
+SECCIONES
 ========================= */
 
 .section{
     background:#08243d;
+    border-radius:18px;
     padding:25px;
-    border-radius:20px;
     margin-bottom:30px;
 }
 
@@ -133,16 +132,20 @@ GESTION PRODUCTOS
     color:#00d9ff;
 }
 
-.form-producto{
+/* =========================
+FORMULARIOS
+========================= */
+
+.form-admin{
     display:flex;
     flex-direction:column;
     gap:15px;
 }
 
-.form-producto input,
-.form-producto textarea,
-.form-producto select{
-    padding:14px;
+.form-admin input,
+.form-admin textarea,
+.form-admin select{
+    padding:15px;
     border:none;
     border-radius:10px;
     background:#14395e;
@@ -150,13 +153,13 @@ GESTION PRODUCTOS
     font-size:15px;
 }
 
-.form-producto textarea{
+.form-admin textarea{
     resize:none;
     height:100px;
 }
 
-.form-producto button{
-    padding:14px;
+.form-admin button{
+    padding:15px;
     border:none;
     border-radius:10px;
     background:#16d2f5;
@@ -166,8 +169,33 @@ GESTION PRODUCTOS
     transition:.3s;
 }
 
-.form-producto button:hover{
+.form-admin button:hover{
     background:#00b7d6;
+}
+
+/* =========================
+BUSCADOR
+========================= */
+
+.filtros-admin{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+
+.filtros-admin input,
+.filtros-admin select{
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#14395e;
+    color:white;
+    font-size:15px;
+}
+
+.filtros-admin input{
+    flex:1;
 }
 
 /* =========================
@@ -180,18 +208,16 @@ table{
 }
 
 table th{
-    text-align:left;
     color:#00d9ff;
-    padding:15px;
+    text-align:left;
+    padding:18px 15px;
     border-bottom:1px solid rgba(255,255,255,.1);
 }
 
 table td{
-    padding:15px;
+    padding:18px 15px;
     border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.btn-editar{
+}.btn-editar{
     background:#16d2f5;
     border:none;
     padding:10px 16px;
@@ -216,7 +242,7 @@ ESTADO PEDIDOS
 ========================= */
 
 .estado-select{
-    padding:8px 12px;
+    padding:10px 12px;
     border:none;
     border-radius:10px;
     background:#ffb800;
@@ -249,15 +275,25 @@ RESPONSIVE
 
 <body>
 
+<!-- LOGIN -->
+
 <div id="loginContainer">
 
     <div class="login-box">
 
         <h2>🔐 Login Administrador</h2>
 
-        <input type="text" id="usuario" placeholder="Usuario">
+        <input
+            type="text"
+            id="usuario"
+            placeholder="Usuario"
+        >
 
-        <input type="password" id="password" placeholder="Contraseña">
+        <input
+            type="password"
+            id="password"
+            placeholder="Contraseña"
+        >
 
         <button onclick="loginAdmin()">
             Ingresar
@@ -267,7 +303,11 @@ RESPONSIVE
 
 </div>
 
-<div id="adminPanel">    <div class="header-admin">
+<!-- PANEL -->
+
+<div id="adminPanel">
+
+    <div class="header-admin">
 
         <h1>⚙️ Panel Administrador</h1>
 
@@ -294,31 +334,41 @@ RESPONSIVE
             <p id="totalProductos">0</p>
         </div>
 
-    </div>
-
-    <!-- GESTION PRODUCTOS -->
+    </div>    <!-- GESTIÓN PRODUCTOS -->
 
     <div class="section">
 
         <h2>📦 Gestión de Productos</h2>
 
-        <div class="form-producto">
+        <div class="form-admin">
 
-            <input type="text"
-            id="nombreProducto"
-            placeholder="Nombre del producto">
+            <input
+                type="hidden"
+                id="productoId"
+            >
+
+            <input
+                type="text"
+                id="nombreProducto"
+                placeholder="Nombre del producto"
+            >
 
             <textarea
-            id="descripcionProducto"
-            placeholder="Descripción del producto"></textarea>
+                id="descripcionProducto"
+                placeholder="Descripción del producto"
+            ></textarea>
 
-            <input type="number"
-            id="precioProducto"
-            placeholder="Precio">
+            <input
+                type="number"
+                id="precioProducto"
+                placeholder="Precio"
+            >
 
-            <input type="text"
-            id="imagenProducto"
-            placeholder="URL de imagen">
+            <input
+                type="text"
+                id="imagenProducto"
+                placeholder="URL de imagen"
+            >
 
             <select id="categoriaProducto">
 
@@ -343,20 +393,22 @@ RESPONSIVE
                 </option>
 
                 <option value="Tecnologia">
-                    Tecnologia
+                    Tecnología
                 </option>
 
             </select>
 
-            <input type="number"
-            id="stockProducto"
-            placeholder="Stock">
+            <input
+                type="number"
+                id="stockProducto"
+                placeholder="Stock"
+            >
 
-            <button id="btnGuardarProducto"
-            onclick="guardarProducto()">
-
+            <button
+                id="btnGuardarProducto"
+                onclick="guardarProducto()"
+            >
                 Agregar Producto
-
             </button>
 
         </div>
@@ -368,6 +420,50 @@ RESPONSIVE
     <div class="section">
 
         <h2>📋 Productos Registrados</h2>
+
+        <!-- BUSCADOR -->
+
+        <div class="filtros-admin">
+
+            <input
+                type="text"
+                id="buscarProducto"
+                placeholder="Buscar producto..."
+                oninput="filtrarProductosAdmin()"
+            >
+
+            <select
+                id="filtroCategoria"
+                onchange="filtrarProductosAdmin()"
+            >
+
+                <option value="">
+                    Todas las categorías
+                </option>
+
+                <option value="Cascos">
+                    Cascos
+                </option>
+
+                <option value="Ropa">
+                    Ropa
+                </option>
+
+                <option value="Accesorios">
+                    Accesorios
+                </option>
+
+                <option value="Calzado">
+                    Calzado
+                </option>
+
+                <option value="Tecnologia">
+                    Tecnología
+                </option>
+
+            </select>
+
+        </div>
 
         <table>
 
@@ -427,9 +523,12 @@ RESPONSIVE
 
 <script>
 
-const API_URL = 'https://backend-strike-motards.onrender.com';
+const API_URL =
+    'https://backend-strike-motards.onrender.com';
 
 let productoEditando = null;
+
+let productosAdmin = [];
 
 /* =========================
 LOGIN ADMIN
@@ -445,9 +544,11 @@ function loginAdmin(){
 
     if(usuario === 'admin' && password === 'geramx'){
 
-        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('loginContainer')
+            .style.display = 'none';
 
-        document.getElementById('adminPanel').style.display = 'block';
+        document.getElementById('adminPanel')
+            .style.display = 'block';
 
         cargarResumen();
         cargarProductos();
@@ -475,24 +576,29 @@ async function cargarResumen(){
         const data =
             await respuesta.json();
 
-        document.getElementById('totalPedidos').textContent =
+        document.getElementById('totalPedidos')
+            .textContent =
             data.totalPedidos;
 
-        document.getElementById('ventasTotales').textContent =
-            `$${Number(data.totalVentas).toLocaleString('es-MX')}`;
+        document.getElementById('ventasTotales')
+            .textContent =
+            `$${Number(data.totalVentas)
+                .toLocaleString('es-MX')}`;
 
-        document.getElementById('totalProductos').textContent =
+        document.getElementById('totalProductos')
+            .textContent =
             data.totalProductos;
 
     }catch(error){
 
-        console.error('Error cargando resumen:', error);
+        console.error(
+            'Error cargando resumen:',
+            error
+        );
 
     }
 
-}
-
-/* =========================
+}/* =========================
 CARGAR PRODUCTOS
 ========================= */
 
@@ -506,54 +612,116 @@ async function cargarProductos(){
         const productos =
             await respuesta.json();
 
-        const tabla =
-            document.getElementById('tablaProductos');
+        productosAdmin = productos;
 
-        tabla.innerHTML = '';
-
-        productos.forEach(producto => {
-
-            tabla.innerHTML += `
-                <tr>
-
-                    <td>#${producto.id}</td>
-
-                    <td>${producto.nombre}</td>
-
-                    <td>${producto.categoria}</td>
-
-                    <td>$${Number(producto.precio).toLocaleString('es-MX')}</td>
-
-                    <td>${producto.stock}</td>
-
-                    <td>
-
-                        <button
-                            class="btn-editar"
-                            onclick='editarProducto(${JSON.stringify(producto)})'
-                        >
-                            Editar
-                        </button>
-
-                        <button
-                            class="btn-eliminar"
-                            onclick="eliminarProducto(${producto.id})"
-                        >
-                            Eliminar
-                        </button>
-
-                    </td>
-
-                </tr>
-            `;
-
-        });
+        renderizarProductosAdmin(productos);
 
     }catch(error){
 
-        console.error('Error cargando productos:', error);
+        console.error(
+            'Error cargando productos:',
+            error
+        );
 
     }
+
+}
+
+/* =========================
+RENDER PRODUCTOS
+========================= */
+
+function renderizarProductosAdmin(productos){
+
+    const tabla =
+        document.getElementById('tablaProductos');
+
+    tabla.innerHTML = '';
+
+    productos.forEach(producto => {
+
+        tabla.innerHTML += `
+            <tr>
+
+                <td>
+                    #${producto.id}
+                </td>
+
+                <td>
+                    ${producto.nombre}
+                </td>
+
+                <td>
+                    ${producto.categoria}
+                </td>
+
+                <td>
+                    $${Number(producto.precio)
+                        .toLocaleString('es-MX')}
+                </td>
+
+                <td>
+                    ${producto.stock}
+                </td>
+
+                <td>
+
+                    <button
+                        class="btn-editar"
+                        onclick='editarProducto(${JSON.stringify(producto)})'
+                    >
+                        Editar
+                    </button>
+
+                    <button
+                        class="btn-eliminar"
+                        onclick="eliminarProducto(${producto.id})"
+                    >
+                        Eliminar
+                    </button>
+
+                </td>
+
+            </tr>
+        `;
+
+    });
+
+}
+
+/* =========================
+FILTRAR PRODUCTOS
+========================= */
+
+function filtrarProductosAdmin(){
+
+    const texto =
+        document.getElementById('buscarProducto')
+            .value
+            .toLowerCase();
+
+    const categoria =
+        document.getElementById('filtroCategoria')
+            .value;
+
+    const filtrados =
+        productosAdmin.filter(producto => {
+
+            const coincideTexto =
+                producto.nombre
+                    .toLowerCase()
+                    .includes(texto);
+
+            const coincideCategoria =
+                categoria === '' ||
+                producto.categoria === categoria;
+
+            return coincideTexto &&
+                   coincideCategoria;
+
+        });
+
+    renderizarProductosAdmin(filtrados);
 
 }/* =========================
 CARGAR PEDIDOS
@@ -579,15 +747,26 @@ async function cargarPedidos(){
             tabla.innerHTML += `
                 <tr>
 
-                    <td>#${pedido.id}</td>
+                    <td>
+                        #${pedido.id}
+                    </td>
 
-                    <td>${pedido.nombre_cliente}</td>
+                    <td>
+                        ${pedido.nombre_cliente}
+                    </td>
 
-                    <td>${pedido.telefono}</td>
+                    <td>
+                        ${pedido.telefono}
+                    </td>
 
-                    <td>${pedido.direccion}</td>
+                    <td>
+                        ${pedido.direccion}
+                    </td>
 
-                    <td>$${Number(pedido.total).toLocaleString('es-MX')}</td>
+                    <td>
+                        $${Number(pedido.total)
+                            .toLocaleString('es-MX')}
+                    </td>
 
                     <td>
 
@@ -596,19 +775,31 @@ async function cargarPedidos(){
                             onchange="cambiarEstadoPedido(${pedido.id}, this.value)"
                         >
 
-                            <option value="Pendiente" ${pedido.estado === 'Pendiente' ? 'selected' : ''}>
+                            <option
+                                value="Pendiente"
+                                ${pedido.estado === 'Pendiente' ? 'selected' : ''}
+                            >
                                 Pendiente
                             </option>
 
-                            <option value="Enviado" ${pedido.estado === 'Enviado' ? 'selected' : ''}>
+                            <option
+                                value="Enviado"
+                                ${pedido.estado === 'Enviado' ? 'selected' : ''}
+                            >
                                 Enviado
                             </option>
 
-                            <option value="Entregado" ${pedido.estado === 'Entregado' ? 'selected' : ''}>
+                            <option
+                                value="Entregado"
+                                ${pedido.estado === 'Entregado' ? 'selected' : ''}
+                            >
                                 Entregado
                             </option>
 
-                            <option value="Cancelado" ${pedido.estado === 'Cancelado' ? 'selected' : ''}>
+                            <option
+                                value="Cancelado"
+                                ${pedido.estado === 'Cancelado' ? 'selected' : ''}
+                            >
                                 Cancelado
                             </option>
 
@@ -623,7 +814,10 @@ async function cargarPedidos(){
 
     }catch(error){
 
-        console.error('Error cargando pedidos:', error);
+        console.error(
+            'Error cargando pedidos:',
+            error
+        );
 
     }
 
@@ -658,7 +852,10 @@ async function cambiarEstadoPedido(id, estado){
 
     }catch(error){
 
-        console.error('Error cambiando estado:', error);
+        console.error(
+            'Error cambiando estado:',
+            error
+        );
 
         alert('Error al cambiar estado');
 
@@ -671,15 +868,43 @@ GUARDAR PRODUCTO
 async function guardarProducto(){
 
     const producto = {
-        nombre: document.getElementById('nombreProducto').value.trim(),
-        descripcion: document.getElementById('descripcionProducto').value.trim(),
-        precio: Number(document.getElementById('precioProducto').value),
-        imagen_url: document.getElementById('imagenProducto').value.trim(),
-        categoria: document.getElementById('categoriaProducto').value,
-        stock: Number(document.getElementById('stockProducto').value)
+        nombre:
+            document.getElementById('nombreProducto')
+                .value
+                .trim(),
+
+        descripcion:
+            document.getElementById('descripcionProducto')
+                .value
+                .trim(),
+
+        precio:
+            Number(
+                document.getElementById('precioProducto')
+                    .value
+            ),
+
+        imagen_url:
+            document.getElementById('imagenProducto')
+                .value
+                .trim(),
+
+        categoria:
+            document.getElementById('categoriaProducto')
+                .value,
+
+        stock:
+            Number(
+                document.getElementById('stockProducto')
+                    .value
+            )
     };
 
-    if(!producto.nombre || !producto.precio || !producto.categoria){
+    if(
+        !producto.nombre ||
+        !producto.precio ||
+        !producto.categoria
+    ){
         alert('Completa nombre, precio y categoría');
         return;
     }
@@ -732,7 +957,10 @@ async function guardarProducto(){
 
     }catch(error){
 
-        console.error('Error guardando producto:', error);
+        console.error(
+            'Error guardando producto:',
+            error
+        );
 
         alert('Error al guardar producto');
 
@@ -810,7 +1038,10 @@ async function eliminarProducto(id){
 
     }catch(error){
 
-        console.error('Error eliminando producto:', error);
+        console.error(
+            'Error eliminando producto:',
+            error
+        );
 
         alert('Error al eliminar producto');
 
