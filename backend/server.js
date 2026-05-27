@@ -329,7 +329,93 @@ app.get('/admin/resumen', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+/* =========================
+   ADMIN PRODUCTOS
+========================= */
 
+// AGREGAR PRODUCTO
+app.post('/admin/productos', async (req, res) => {
+  try {
+    const { nombre, descripcion, precio, imagen_url, categoria, stock } = req.body;
+
+    if (!nombre || !precio || !categoria) {
+      return res.status(400).json({ error: 'Faltan datos obligatorios' });
+    }
+
+    const nuevoProducto = await Producto.create({
+      nombre,
+      descripcion,
+      precio,
+      imagen_url,
+      categoria,
+      stock: Number(stock || 0)
+    });
+
+    res.status(201).json({
+      mensaje: 'Producto agregado correctamente',
+      producto: nuevoProducto
+    });
+
+  } catch (err) {
+    console.error('Error al agregar producto:', err);
+    res.status(500).json({ error: 'Error al agregar producto' });
+  }
+});
+
+// EDITAR PRODUCTO
+app.put('/admin/productos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, descripcion, precio, imagen_url, categoria, stock } = req.body;
+
+    const producto = await Producto.findByPk(id);
+
+    if (!producto) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+
+    await producto.update({
+      nombre,
+      descripcion,
+      precio,
+      imagen_url,
+      categoria,
+      stock: Number(stock || 0)
+    });
+
+    res.json({
+      mensaje: 'Producto actualizado correctamente',
+      producto
+    });
+
+  } catch (err) {
+    console.error('Error al editar producto:', err);
+    res.status(500).json({ error: 'Error al editar producto' });
+  }
+});
+
+// ELIMINAR PRODUCTO
+app.delete('/admin/productos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const producto = await Producto.findByPk(id);
+
+    if (!producto) {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+
+    await producto.destroy();
+
+    res.json({
+      mensaje: 'Producto eliminado correctamente'
+    });
+
+  } catch (err) {
+    console.error('Error al eliminar producto:', err);
+    res.status(500).json({ error: 'Error al eliminar producto' });
+  }
+});
 /* =========================
    RUTA DE PRUEBA
 ========================= */
