@@ -293,7 +293,46 @@ app.get('/pedidos', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+/* =========================
+   CAMBIAR ESTADO PEDIDO
+========================= */
 
+app.put('/admin/pedidos/:id/estado', async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const { estado } = req.body;
+
+    const pedido = await Pedido.findByPk(id);
+
+    if (!pedido) {
+      return res.status(404).json({
+        error: 'Pedido no encontrado'
+      });
+    }
+
+    pedido.estado = estado;
+
+    await pedido.save();
+
+    res.json({
+      mensaje: 'Estado actualizado correctamente',
+      pedido
+    });
+
+  } catch (err) {
+
+    console.error('Error al cambiar estado:', err);
+
+    res.status(500).json({
+      error: 'Error al actualizar estado'
+    });
+
+  }
+
+});
 /* =========================
    API RESUMEN ADMIN
 ========================= */
