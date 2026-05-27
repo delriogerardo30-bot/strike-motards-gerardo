@@ -117,34 +117,35 @@ PANEL
 .card p{
     font-size:55px;
     font-weight:bold;
-}
-
-/* =========================
-FORM PRODUCTOS
+}/* =========================
+GESTION PRODUCTOS
 ========================= */
 
-.form-producto{
+.section{
     background:#08243d;
     padding:25px;
-    border-radius:15px;
+    border-radius:20px;
     margin-bottom:30px;
+}
 
+.section h2{
+    margin-bottom:20px;
+    color:#00d9ff;
+}
+
+.form-producto{
     display:flex;
     flex-direction:column;
     gap:15px;
 }
 
-.form-producto h2{
-    color:#00d9ff;
-}
-
 .form-producto input,
 .form-producto textarea,
 .form-producto select{
-    padding:12px;
+    padding:14px;
     border:none;
     border-radius:10px;
-    background:#0f3558;
+    background:#14395e;
     color:white;
     font-size:15px;
 }
@@ -155,13 +156,14 @@ FORM PRODUCTOS
 }
 
 .form-producto button{
-    background:#00d9ff;
-    color:black;
     padding:14px;
     border:none;
     border-radius:10px;
+    background:#16d2f5;
+    color:black;
     font-weight:bold;
     cursor:pointer;
+    transition:.3s;
 }
 
 .form-producto button:hover{
@@ -172,59 +174,74 @@ FORM PRODUCTOS
 TABLAS
 ========================= */
 
-.tabla-container{
-    background:#08243d;
-    padding:20px;
-    border-radius:15px;
-    margin-bottom:30px;
-}
-
-.tabla-container h2{
-    margin-bottom:20px;
-}
-
 table{
     width:100%;
     border-collapse:collapse;
 }
 
-th{
-    color:#00d9ff;
+table th{
     text-align:left;
+    color:#00d9ff;
     padding:15px;
+    border-bottom:1px solid rgba(255,255,255,.1);
 }
 
-td{
+table td{
     padding:15px;
-    border-top:1px solid rgba(255,255,255,.1);
+    border-bottom:1px solid rgba(255,255,255,.08);
 }
 
-.estado{
-    background:#ffb800;
-    color:black;
-    padding:8px 15px;
-    border-radius:20px;
-    font-size:14px;
+.btn-editar{
+    background:#16d2f5;
+    border:none;
+    padding:10px 16px;
+    border-radius:10px;
+    cursor:pointer;
     font-weight:bold;
+    margin-right:10px;
 }
 
 .btn-eliminar{
     background:red;
     color:white;
     border:none;
-    padding:10px 15px;
+    padding:10px 16px;
     border-radius:10px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+/* =========================
+ESTADO PEDIDOS
+========================= */
+
+.estado-select{
+    padding:8px 12px;
+    border:none;
+    border-radius:10px;
+    background:#ffb800;
+    color:black;
+    font-weight:bold;
     cursor:pointer;
 }
 
-.btn-editar{
-    background:#00d9ff;
-    color:black;
-    border:none;
-    padding:10px 15px;
-    border-radius:10px;
-    cursor:pointer;
-    margin-right:10px;
+/* =========================
+RESPONSIVE
+========================= */
+
+@media(max-width:768px){
+
+    .header-admin{
+        flex-direction:column;
+        gap:15px;
+        text-align:center;
+    }
+
+    table{
+        display:block;
+        overflow-x:auto;
+    }
+
 }
 
 </style>
@@ -232,27 +249,15 @@ td{
 
 <body>
 
-<!-- =========================
-LOGIN
-========================= -->
-
 <div id="loginContainer">
 
     <div class="login-box">
 
         <h2>🔐 Login Administrador</h2>
 
-        <input
-            type="text"
-            id="usuario"
-            placeholder="Usuario"
-        >
+        <input type="text" id="usuario" placeholder="Usuario">
 
-        <input
-            type="password"
-            id="password"
-            placeholder="Contraseña"
-        >
+        <input type="password" id="password" placeholder="Contraseña">
 
         <button onclick="loginAdmin()">
             Ingresar
@@ -262,15 +267,9 @@ LOGIN
 
 </div>
 
-<!-- =========================
-PANEL ADMIN
-========================= -->
+<div id="adminPanel">    <div class="header-admin">
 
-<div id="adminPanel">
-
-    <div class="header-admin">
-
-        <h1>⚙ Panel Administrador</h1>
+        <h1>⚙️ Panel Administrador</h1>
 
         <h2>Strike Motards</h2>
 
@@ -295,83 +294,78 @@ PANEL ADMIN
             <p id="totalProductos">0</p>
         </div>
 
-    </div>    <!-- FORMULARIO PRODUCTOS -->
+    </div>
 
-    <div class="form-producto">
+    <!-- GESTION PRODUCTOS -->
+
+    <div class="section">
 
         <h2>📦 Gestión de Productos</h2>
 
-        <input
-            type="hidden"
-            id="productoId"
-        >
+        <div class="form-producto">
 
-        <input
-            type="text"
+            <input type="text"
             id="nombreProducto"
-            placeholder="Nombre del producto"
-        >
+            placeholder="Nombre del producto">
 
-        <textarea
+            <textarea
             id="descripcionProducto"
-            placeholder="Descripción del producto"
-        ></textarea>
+            placeholder="Descripción del producto"></textarea>
 
-        <input
-            type="number"
+            <input type="number"
             id="precioProducto"
-            placeholder="Precio"
-        >
+            placeholder="Precio">
 
-        <input
-            type="text"
+            <input type="text"
             id="imagenProducto"
-            placeholder="URL de imagen"
-        >
+            placeholder="URL de imagen">
 
-        <select id="categoriaProducto">
+            <select id="categoriaProducto">
 
-            <option value="">
-                Selecciona categoría
-            </option>
+                <option value="">
+                    Selecciona categoría
+                </option>
 
-            <option value="Cascos">
-                Cascos
-            </option>
+                <option value="Cascos">
+                    Cascos
+                </option>
 
-            <option value="Ropa">
-                Ropa
-            </option>
+                <option value="Ropa">
+                    Ropa
+                </option>
 
-            <option value="Accesorios">
-                Accesorios
-            </option>
+                <option value="Accesorios">
+                    Accesorios
+                </option>
 
-            <option value="Calzado">
-                Calzado
-            </option>
+                <option value="Calzado">
+                    Calzado
+                </option>
 
-            <option value="Tecnología">
-                Tecnología
-            </option>
+                <option value="Tecnologia">
+                    Tecnologia
+                </option>
 
-        </select>
+            </select>
 
-        <input
-            type="number"
+            <input type="number"
             id="stockProducto"
-            placeholder="Stock"
-        >
+            placeholder="Stock">
 
-        <button onclick="guardarProducto()" id="btnGuardarProducto">
-            Agregar Producto
-        </button>
+            <button id="btnGuardarProducto"
+            onclick="guardarProducto()">
+
+                Agregar Producto
+
+            </button>
+
+        </div>
 
     </div>
 
-    <!-- TABLA PRODUCTOS -->
+    <!-- PRODUCTOS -->
 
-    <div class="tabla-container">
+    <div class="section">
 
         <h2>📋 Productos Registrados</h2>
 
@@ -380,26 +374,27 @@ PANEL ADMIN
             <thead>
 
                 <tr>
+
                     <th>ID</th>
                     <th>Producto</th>
                     <th>Categoría</th>
                     <th>Precio</th>
                     <th>Stock</th>
                     <th>Acciones</th>
+
                 </tr>
 
             </thead>
 
             <tbody id="tablaProductos">
+
             </tbody>
 
         </table>
 
-    </div>
+    </div>    <!-- PEDIDOS -->
 
-    <!-- TABLA PEDIDOS -->
-
-    <div class="tabla-container">
+    <div class="section">
 
         <h2>🧾 Pedidos Recientes</h2>
 
@@ -408,26 +403,33 @@ PANEL ADMIN
             <thead>
 
                 <tr>
+
                     <th>ID</th>
                     <th>Cliente</th>
                     <th>Teléfono</th>
                     <th>Dirección</th>
                     <th>Total</th>
                     <th>Estado</th>
+
                 </tr>
 
             </thead>
 
             <tbody id="tablaPedidos">
+
             </tbody>
 
         </table>
 
     </div>
 
-</div><script>
+</div>
+
+<script>
 
 const API_URL = 'https://backend-strike-motards.onrender.com';
+
+let productoEditando = null;
 
 /* =========================
 LOGIN ADMIN
@@ -435,12 +437,16 @@ LOGIN ADMIN
 
 function loginAdmin(){
 
-    const usuario = document.getElementById('usuario').value.trim();
-    const password = document.getElementById('password').value.trim();
+    const usuario =
+        document.getElementById('usuario').value.trim();
+
+    const password =
+        document.getElementById('password').value.trim();
 
     if(usuario === 'admin' && password === 'geramx'){
 
         document.getElementById('loginContainer').style.display = 'none';
+
         document.getElementById('adminPanel').style.display = 'block';
 
         cargarResumen();
@@ -448,8 +454,11 @@ function loginAdmin(){
         cargarPedidos();
 
     }else{
+
         alert('Usuario o contraseña incorrectos');
+
     }
+
 }
 
 /* =========================
@@ -460,8 +469,11 @@ async function cargarResumen(){
 
     try{
 
-        const respuesta = await fetch(`${API_URL}/admin/resumen`);
-        const data = await respuesta.json();
+        const respuesta =
+            await fetch(`${API_URL}/admin/resumen`);
+
+        const data =
+            await respuesta.json();
 
         document.getElementById('totalPedidos').textContent =
             data.totalPedidos;
@@ -473,8 +485,11 @@ async function cargarResumen(){
             data.totalProductos;
 
     }catch(error){
+
         console.error('Error cargando resumen:', error);
+
     }
+
 }
 
 /* =========================
@@ -485,10 +500,14 @@ async function cargarProductos(){
 
     try{
 
-        const respuesta = await fetch(`${API_URL}/productos`);
-        const productos = await respuesta.json();
+        const respuesta =
+            await fetch(`${API_URL}/productos`);
 
-        const tabla = document.getElementById('tablaProductos');
+        const productos =
+            await respuesta.json();
+
+        const tabla =
+            document.getElementById('tablaProductos');
 
         tabla.innerHTML = '';
 
@@ -496,12 +515,19 @@ async function cargarProductos(){
 
             tabla.innerHTML += `
                 <tr>
+
                     <td>#${producto.id}</td>
+
                     <td>${producto.nombre}</td>
+
                     <td>${producto.categoria}</td>
+
                     <td>$${Number(producto.precio).toLocaleString('es-MX')}</td>
+
                     <td>${producto.stock}</td>
+
                     <td>
+
                         <button
                             class="btn-editar"
                             onclick='editarProducto(${JSON.stringify(producto)})'
@@ -515,15 +541,20 @@ async function cargarProductos(){
                         >
                             Eliminar
                         </button>
+
                     </td>
+
                 </tr>
             `;
 
         });
 
     }catch(error){
+
         console.error('Error cargando productos:', error);
+
     }
+
 }/* =========================
 CARGAR PEDIDOS
 ========================= */
@@ -532,10 +563,14 @@ async function cargarPedidos(){
 
     try{
 
-        const respuesta = await fetch(`${API_URL}/pedidos`);
-        const pedidos = await respuesta.json();
+        const respuesta =
+            await fetch(`${API_URL}/pedidos`);
 
-        const tabla = document.getElementById('tablaPedidos');
+        const pedidos =
+            await respuesta.json();
+
+        const tabla =
+            document.getElementById('tablaPedidos');
 
         tabla.innerHTML = '';
 
@@ -543,33 +578,97 @@ async function cargarPedidos(){
 
             tabla.innerHTML += `
                 <tr>
+
                     <td>#${pedido.id}</td>
+
                     <td>${pedido.nombre_cliente}</td>
+
                     <td>${pedido.telefono}</td>
+
                     <td>${pedido.direccion}</td>
+
                     <td>$${Number(pedido.total).toLocaleString('es-MX')}</td>
+
                     <td>
-                        <span class="estado">
-                            ${pedido.estado}
-                        </span>
+
+                        <select
+                            class="estado-select"
+                            onchange="cambiarEstadoPedido(${pedido.id}, this.value)"
+                        >
+
+                            <option value="Pendiente" ${pedido.estado === 'Pendiente' ? 'selected' : ''}>
+                                Pendiente
+                            </option>
+
+                            <option value="Enviado" ${pedido.estado === 'Enviado' ? 'selected' : ''}>
+                                Enviado
+                            </option>
+
+                            <option value="Entregado" ${pedido.estado === 'Entregado' ? 'selected' : ''}>
+                                Entregado
+                            </option>
+
+                            <option value="Cancelado" ${pedido.estado === 'Cancelado' ? 'selected' : ''}>
+                                Cancelado
+                            </option>
+
+                        </select>
+
                     </td>
+
                 </tr>
             `;
 
         });
 
     }catch(error){
+
         console.error('Error cargando pedidos:', error);
+
     }
+
 }
 
 /* =========================
+CAMBIAR ESTADO PEDIDO
+========================= */
+
+async function cambiarEstadoPedido(id, estado){
+
+    try{
+
+        const respuesta =
+            await fetch(`${API_URL}/admin/pedidos/${id}/estado`, {
+                method:'PUT',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify({ estado })
+            });
+
+        const data =
+            await respuesta.json();
+
+        if(!respuesta.ok){
+            alert(data.error || 'Error al cambiar estado');
+            return;
+        }
+
+        cargarPedidos();
+
+    }catch(error){
+
+        console.error('Error cambiando estado:', error);
+
+        alert('Error al cambiar estado');
+
+    }
+
+}/* =========================
 GUARDAR PRODUCTO
 ========================= */
 
 async function guardarProducto(){
-
-    const id = document.getElementById('productoId').value;
 
     const producto = {
         nombre: document.getElementById('nombreProducto').value.trim(),
@@ -587,47 +686,67 @@ async function guardarProducto(){
 
     try{
 
-        let url = `${API_URL}/admin/productos`;
-        let metodo = 'POST';
+        let url =
+            `${API_URL}/admin/productos`;
 
-        if(id){
-            url = `${API_URL}/admin/productos/${id}`;
-            metodo = 'PUT';
+        let metodo =
+            'POST';
+
+        if(productoEditando){
+
+            url =
+                `${API_URL}/admin/productos/${productoEditando}`;
+
+            metodo =
+                'PUT';
+
         }
 
-        const respuesta = await fetch(url, {
-            method: metodo,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(producto)
-        });
+        const respuesta =
+            await fetch(url, {
+                method:metodo,
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body:JSON.stringify(producto)
+            });
 
-        const data = await respuesta.json();
+        const data =
+            await respuesta.json();
 
         if(!respuesta.ok){
             alert(data.error || 'Error al guardar producto');
             return;
         }
 
-        alert(id ? 'Producto actualizado' : 'Producto agregado');
+        alert(
+            productoEditando
+                ? 'Producto actualizado correctamente'
+                : 'Producto agregado correctamente'
+        );
 
-        limpiarFormularioProducto();
+        limpiarFormulario();
 
         cargarProductos();
         cargarResumen();
 
     }catch(error){
+
         console.error('Error guardando producto:', error);
+
         alert('Error al guardar producto');
+
     }
-}/* =========================
+
+}
+
+/* =========================
 EDITAR PRODUCTO
 ========================= */
 
 function editarProducto(producto){
 
-    document.getElementById('productoId').value =
+    productoEditando =
         producto.id;
 
     document.getElementById('nombreProducto').value =
@@ -655,9 +774,8 @@ function editarProducto(producto){
         top:0,
         behavior:'smooth'
     });
-}
 
-/* =========================
+}/* =========================
 ELIMINAR PRODUCTO
 ========================= */
 
@@ -691,18 +809,23 @@ async function eliminarProducto(id){
         cargarResumen();
 
     }catch(error){
+
         console.error('Error eliminando producto:', error);
+
         alert('Error al eliminar producto');
+
     }
+
 }
 
 /* =========================
 LIMPIAR FORMULARIO
 ========================= */
 
-function limpiarFormularioProducto(){
+function limpiarFormulario(){
 
-    document.getElementById('productoId').value = '';
+    productoEditando = null;
+
     document.getElementById('nombreProducto').value = '';
     document.getElementById('descripcionProducto').value = '';
     document.getElementById('precioProducto').value = '';
@@ -712,6 +835,7 @@ function limpiarFormularioProducto(){
 
     document.getElementById('btnGuardarProducto').textContent =
         'Agregar Producto';
+
 }
 
 </script>
