@@ -9,6 +9,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+/* =========================
+   CONEXIÓN A POSTGRES
+========================= */
 const sequelize = new Sequelize(
   process.env.DATABASE_URL || 'postgres://postgres:12345@localhost:5432/strike_motors_db',
   {
@@ -33,7 +36,9 @@ const Producto = sequelize.define('Producto', {
     type: DataTypes.STRING,
     allowNull: false
   },
-  descripcion: DataTypes.TEXT,
+  descripcion: {
+    type: DataTypes.TEXT
+  },
   precio: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false
@@ -87,9 +92,7 @@ const Pedido = sequelize.define('Pedido', {
 }, {
   tableName: 'pedidos',
   timestamps: false
-});
-
-/* =========================
+});/* =========================
    MODELO DETALLE PEDIDOS
 ========================= */
 const DetallePedido = sequelize.define('DetallePedido', {
@@ -269,9 +272,7 @@ app.post('/pedidos', async (req, res) => {
       error: 'Error al registrar el pedido'
     });
   }
-});
-
-/* =========================
+});/* =========================
    API VER PEDIDOS
 ========================= */
 app.get('/pedidos', async (req, res) => {
@@ -289,6 +290,42 @@ app.get('/pedidos', async (req, res) => {
     res.json(pedidos);
   } catch (err) {
     console.error('Error al obtener pedidos:', err);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
+/* =========================
+   API RESUMEN ADMIN
+========================= */
+app.get('/admin/resumen', async (req, res) => {
+  try {
+    const totalProductos = await Producto.count();
+    const totalPedidos = await Pedido.count();
+
+    const pedidos = await Pedido.findAll();
+
+    const totalVentas = pedidos.reduce((sum, pedido) => {
+      return sum + Number(pedido.total || 0);
+    }, 0);
+
+    const productosBajoStock = await Producto.findAll({
+      where: {
+        stock: {
+          [Sequelize.Op.lte]: 3
+        }
+      },
+      order: [['stock', 'ASC']]
+    });
+
+    res.json({
+      totalProductos,
+      totalPedidos,
+      totalVentas,
+      productosBajoStock
+    });
+
+  } catch (err) {
+    console.error('Error en resumen admin:', err);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
