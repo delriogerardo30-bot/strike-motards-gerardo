@@ -173,14 +173,14 @@
 
       try {
 
-        const respuesta = await fetch('https://strike-motards-gerardo.onrender.com/admin/resumen');
+        const respuesta = await fetch('https://backend-strike-motards.onrender.com/admin/resumen')
 
         const data = await respuesta.json();
 
         document.getElementById('totalPedidos').textContent = data.totalPedidos;
 
         document.getElementById('ventasTotales').textContent =
-          `$${Number(data.ventasTotales).toLocaleString()}`;
+          `$${Number(data.totalVentas).toLocaleString()}`;
 
         document.getElementById('totalProductos').textContent =
           data.totalProductos;
@@ -197,7 +197,7 @@
 
       try {
 
-        const respuesta = await fetch('https://strike-motards-gerardo.onrender.com/admin/pedidos');
+        const respuesta = await fetch('https://backend-strike-motards.onrender.com/admin/pedidos')
 
         const pedidos = await respuesta.json();
 
