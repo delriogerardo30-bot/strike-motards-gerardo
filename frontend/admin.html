@@ -1,253 +1,424 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Panel Admin - Strike Motards</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:Arial, Helvetica, sans-serif;
-    }
+    <title>Panel Admin - Strike Motards</title>
 
-    body{
-      background:#07131d;
-      color:white;
-    }
+    <style>
 
-    .header{
-      width:100%;
-      padding:20px 40px;
-      background:#081b29;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      border-bottom:1px solid rgba(255,255,255,0.1);
-    }
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, Helvetica, sans-serif;
+        }
 
-    .header h1{
-      color:#00e0ff;
-    }
+        body{
+            background:#000c18;
+            color:white;
+        }
 
-    .container{
-      padding:30px;
-    }
+        /* =========================
+           LOGIN
+        ========================== */
 
-    .cards{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-      gap:20px;
-      margin-bottom:30px;
-    }
+        .login-container{
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:#000c18;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+            z-index:9999;
+        }
 
-    .card{
-      background:#0d2436;
-      padding:25px;
-      border-radius:15px;
-      box-shadow:0 0 10px rgba(0,0,0,0.4);
-    }
+        .login-box{
+            background:#07233d;
+            padding:40px;
+            border-radius:15px;
+            width:350px;
+            display:flex;
+            flex-direction:column;
+            gap:15px;
+            box-shadow:0 0 20px rgba(0,255,255,0.2);
+        }
 
-    .card h2{
-      font-size:18px;
-      margin-bottom:10px;
-      color:#00e0ff;
-    }
+        .login-box h2{
+            color:#00d9ff;
+            text-align:center;
+        }
 
-    .card p{
-      font-size:30px;
-      font-weight:bold;
-    }
+        .login-box input{
+            padding:12px;
+            border:none;
+            border-radius:8px;
+            font-size:16px;
+        }
 
-    .tabla-contenedor{
-      background:#0d2436;
-      padding:20px;
-      border-radius:15px;
-      overflow-x:auto;
-    }
+        .login-box button{
+            padding:12px;
+            border:none;
+            border-radius:8px;
+            background:#00d9ff;
+            color:black;
+            font-weight:bold;
+            cursor:pointer;
+            transition:0.3s;
+        }
 
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:15px;
-    }
+        .login-box button:hover{
+            background:white;
+        }
 
-    th, td{
-      padding:15px;
-      text-align:left;
-      border-bottom:1px solid rgba(255,255,255,0.1);
-    }
+        #errorLogin{
+            color:red;
+            text-align:center;
+        }
 
-    th{
-      background:#102c44;
-      color:#00e0ff;
-    }
+        /* =========================
+           PANEL
+        ========================== */
 
-    tr:hover{
-      background:#132f47;
-    }
+        .header{
+            background:#02192c;
+            padding:30px 40px;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            border-bottom:1px solid rgba(255,255,255,0.1);
+        }
 
-    .estado{
-      padding:5px 10px;
-      border-radius:10px;
-      font-size:12px;
-      font-weight:bold;
-    }
+        .header h1{
+            color:#00d9ff;
+        }
 
-    .pendiente{
-      background:orange;
-      color:black;
-    }
+        .container{
+            padding:30px;
+        }
 
-    .completado{
-      background:limegreen;
-      color:white;
-    }
+        .cards{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+            gap:20px;
+            margin-bottom:30px;
+        }
 
-    .cancelado{
-      background:red;
-      color:white;
-    }
+        .card{
+            background:#07233d;
+            padding:25px;
+            border-radius:15px;
+        }
 
-  </style>
+        .card h3{
+            color:#00d9ff;
+            margin-bottom:15px;
+        }
+
+        .card p{
+            font-size:50px;
+            font-weight:bold;
+        }
+
+        .tabla-container{
+            background:#07233d;
+            padding:20px;
+            border-radius:15px;
+            overflow:auto;
+        }
+
+        table{
+            width:100%;
+            border-collapse:collapse;
+            margin-top:20px;
+        }
+
+        th{
+            color:#00d9ff;
+            text-align:left;
+            padding:15px;
+            border-bottom:1px solid rgba(255,255,255,0.1);
+        }
+
+        td{
+            padding:15px;
+            border-bottom:1px solid rgba(255,255,255,0.1);
+        }
+
+        .estado{
+            padding:8px 15px;
+            border-radius:20px;
+            font-size:14px;
+            font-weight:bold;
+            display:inline-block;
+        }
+
+        .pendiente{
+            background:#ffb300;
+            color:black;
+        }
+
+        .completado{
+            background:#00c853;
+            color:white;
+        }
+
+    </style>
+
 </head>
 
 <body>
 
-  <div class="header">
-    <h1>⚙ Panel Administrador</h1>
-    <h2>Strike Motards</h2>
-  </div>
+    <!-- LOGIN -->
 
-  <div class="container">
+    <div id="loginContainer" class="login-container">
 
-    <div class="cards">
+        <div class="login-box">
 
-      <div class="card">
-        <h2>Total de Pedidos</h2>
-        <p id="totalPedidos">0</p>
-      </div>
+            <h2>🔐 Login Administrador</h2>
 
-      <div class="card">
-        <h2>Ventas Totales</h2>
-        <p id="ventasTotales">$0</p>
-      </div>
+            <input type="text"
+                   id="usuario"
+                   placeholder="Usuario">
 
-      <div class="card">
-        <h2>Productos</h2>
-        <p id="totalProductos">0</p>
-      </div>
+            <input type="password"
+                   id="password"
+                   placeholder="Contraseña">
 
-    </div>
+            <button onclick="loginAdmin()">
+                Ingresar
+            </button>
 
-    <div class="tabla-contenedor">
+            <p id="errorLogin"></p>
 
-      <h2>Pedidos Recientes</h2>
-
-      <table>
-
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Cliente</th>
-            <th>Teléfono</th>
-            <th>Dirección</th>
-            <th>Total</th>
-            <th>Estado</th>
-          </tr>
-        </thead>
-
-        <tbody id="tablaPedidos">        </tbody>
-
-      </table>
+        </div>
 
     </div>
 
-  </div>
+    <!-- PANEL -->
 
-  <script>
+    <div class="container"
+         id="panelAdmin"
+         style="display:none;">
 
-    async function cargarResumen() {
+        <div class="header">
 
-      try {
+            <h1>⚙ Panel Administrador</h1>
 
-        const respuesta = await fetch('https://backend-strike-motards.onrender.com/admin/resumen')
+            <h2>Strike Motards</h2>
 
-        const data = await respuesta.json();
+        </div>
 
-        document.getElementById('totalPedidos').textContent = data.totalPedidos;
+        <br>
 
-        document.getElementById('ventasTotales').textContent =
-          `$${Number(data.totalVentas).toLocaleString()}`;
+        <div class="cards">
 
-        document.getElementById('totalProductos').textContent =
-          data.totalProductos;
+            <div class="card">
+                <h3>Total de Pedidos</h3>
+                <p id="totalPedidos">0</p>
+            </div>
 
-      } catch (error) {
+            <div class="card">
+                <h3>Ventas Totales</h3>
+                <p id="ventasTotales">$0</p>
+            </div>
 
-        console.error('Error cargando resumen:', error);
+            <div class="card">
+                <h3>Productos</h3>
+                <p id="totalProductos">0</p>
+            </div>
 
-      }
+        </div>
 
-    }
+        <div class="tabla-container">
 
-    async function cargarPedidos() {
+            <h1>Pedidos Recientes</h1>
 
-      try {
+            <table>
 
-        const respuesta = await fetch('https://backend-strike-motards.onrender.com/pedidos')
+                <thead>
 
-        const pedidos = await respuesta.json();
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Teléfono</th>
+                        <th>Dirección</th>
+                        <th>Total</th>
+                        <th>Estado</th>
+                    </tr>
 
-        const tabla = document.getElementById('tablaPedidos');
+                </thead>
 
-        tabla.innerHTML = '';
+                <tbody id="tablaPedidos">                </tbody>
 
-        pedidos.forEach(pedido => {
+            </table>
 
-          let claseEstado = 'pendiente';
+        </div>
 
-          if (pedido.estado === 'Completado') {
-            claseEstado = 'completado';
-          }
+    </div>
 
-          if (pedido.estado === 'Cancelado') {
-            claseEstado = 'cancelado';
-          }
+    <script>
 
-          tabla.innerHTML += `
-            <tr>
-              <td>${pedido.id}</td>
-              <td>${pedido.nombre_cliente}</td>
-              <td>${pedido.telefono}</td>
-              <td>${pedido.direccion}</td>
-              <td>$${Number(pedido.total).toLocaleString()}</td>
+        /* =========================
+           LOGIN ADMIN
+        ========================== */
 
-              <td>
-                <span class="estado ${claseEstado}">
-                  ${pedido.estado}
-                </span>
-              </td>
+        function loginAdmin(){
 
-            </tr>
-          `;
+            const usuario =
+                document.getElementById('usuario').value;
 
-        });
+            const password =
+                document.getElementById('password').value;
 
-      } catch (error) {
+            if(
+                usuario === 'admin' &&
+                password === 'geramx'
+            ){
 
-        console.error('Error cargando pedidos:', error);
+                document.getElementById('loginContainer')
+                    .style.display = 'none';
 
-      }
+                document.getElementById('panelAdmin')
+                    .style.display = 'block';
 
-    }
+                cargarResumen();
+                cargarPedidos();
 
-    cargarResumen();
-    cargarPedidos();
+            }else{
 
-  </script>
+                document.getElementById('errorLogin')
+                    .textContent =
+                    'Usuario o contraseña incorrectos';
+
+            }
+
+        }
+
+        /* =========================
+           CARGAR RESUMEN
+        ========================== */
+
+        async function cargarResumen(){
+
+            try{
+
+                const respuesta =
+                    await fetch(
+                        'https://backend-strike-motards.onrender.com/admin/resumen'
+                    );
+
+                const data =
+                    await respuesta.json();
+
+                document.getElementById('totalPedidos')
+                    .textContent =
+                    data.totalPedidos;
+
+                document.getElementById('ventasTotales')
+                    .textContent =
+                    `$${Number(data.totalVentas).toLocaleString()}`;
+
+                document.getElementById('totalProductos')
+                    .textContent =
+                    data.totalProductos;
+
+            }catch(error){
+
+                console.error(
+                    'Error cargando resumen:',
+                    error
+                );
+
+            }
+
+        }
+
+        /* =========================
+           CARGAR PEDIDOS
+        ========================== */
+
+        async function cargarPedidos(){
+
+            try{
+
+                const respuesta =
+                    await fetch(
+                        'https://backend-strike-motards.onrender.com/pedidos'
+                    );
+
+                const pedidos =
+                    await respuesta.json();
+
+                const tabla =
+                    document.getElementById('tablaPedidos');
+
+                tabla.innerHTML = '';
+
+                pedidos.forEach(pedido => {
+
+                    let claseEstado =
+                        'pendiente';
+
+                    if(
+                        pedido.estado === 'Completado'
+                    ){
+                        claseEstado = 'completado';
+                    }
+
+                    tabla.innerHTML += `
+                        <tr>
+
+                            <td>
+                                #${pedido.id}
+                            </td>
+
+                            <td>
+                                ${pedido.nombre_cliente}
+                            </td>
+
+                            <td>
+                                ${pedido.telefono}
+                            </td>
+
+                            <td>
+                                ${pedido.direccion}
+                            </td>
+
+                            <td>
+                                $${Number(pedido.total).toLocaleString()}
+                            </td>
+
+                            <td>
+
+                                <span class="estado ${claseEstado}">
+                                    ${pedido.estado}
+                                </span>
+
+                            </td>
+
+                        </tr>
+                    `;
+
+                });
+
+            }catch(error){
+
+                console.error(
+                    'Error cargando pedidos:',
+                    error
+                );
+
+            }
+
+        }
+
+    </script>
 
 </body>
 </html>
