@@ -767,25 +767,17 @@ async function confirmOrder() {
             return;
         }
 
-        let mensaje =
-            "🧾 *COMANDA DE PEDIDO - STRIKE MOTARDS*%0A";
-        mensaje +=
-            "━━━━━━━━━━━━━━━━━━━━%0A%0A";
+        let mensaje = "";
 
-        mensaje +=
-            `*Pedido:* #${resultado.pedido_id}%0A`;
+        mensaje += "COMANDA DE PEDIDO - STRIKE MOTARDS\n";
+        mensaje += "━━━━━━━━━━━━━━━━━━━━\n\n";
 
-        mensaje +=
-            `*Cliente:* ${encodeURIComponent(nombre)}%0A`;
+        mensaje += `Pedido: #${resultado.pedido_id}\n`;
+        mensaje += `Cliente: ${nombre}\n`;
+        mensaje += `Teléfono: ${telefono}\n`;
+        mensaje += `Dirección: ${direccion}\n\n`;
 
-        mensaje +=
-            `*Teléfono:* ${encodeURIComponent(telefono)}%0A`;
-
-        mensaje +=
-            `*Dirección:* ${encodeURIComponent(direccion)}%0A%0A`;
-
-        mensaje +=
-            "*PRODUCTOS:*%0A";
+        mensaje += "PRODUCTOS:\n";
 
         let total = 0;
 
@@ -800,35 +792,21 @@ async function confirmOrder() {
             const subtotal =
                 precio * qty;
 
-            mensaje +=
-                `%0A${index + 1}. ${encodeURIComponent(p.nombre)}%0A`;
-
-            mensaje +=
-                `   Cantidad: ${qty}%0A`;
-
-            mensaje +=
-                `   Precio unitario: $${precio.toLocaleString("es-MX")} MXN%0A`;
-
-            mensaje +=
-                `   Subtotal: $${subtotal.toLocaleString("es-MX")} MXN%0A`;
+            mensaje += `\n${index + 1}. ${p.nombre}\n`;
+            mensaje += `Cantidad: ${qty}\n`;
+            mensaje += `Precio unitario: $${precio.toLocaleString("es-MX")} MXN\n`;
+            mensaje += `Subtotal: $${subtotal.toLocaleString("es-MX")} MXN\n`;
 
             total += subtotal;
         });
 
-        mensaje +=
-            "%0A━━━━━━━━━━━━━━━━━━━━%0A";
-
-        mensaje +=
-            `*TOTAL:* $${total.toLocaleString("es-MX")} MXN%0A`;
-
-        mensaje +=
-            "━━━━━━━━━━━━━━━━━━━━%0A";
-
-        mensaje +=
-            "%0A_Estado: Pendiente de confirmación_";
+        mensaje += "\n━━━━━━━━━━━━━━━━━━━━\n";
+        mensaje += `TOTAL: $${total.toLocaleString("es-MX")} MXN\n`;
+        mensaje += "━━━━━━━━━━━━━━━━━━━━\n";
+        mensaje += "\nEstado: Pendiente de confirmación";
 
         const url =
-            `https://wa.me/527292529554?text=${mensaje}`;
+            `https://wa.me/527292529554?text=${encodeURIComponent(mensaje)}`;
 
         window.open(url, "_blank");
 
