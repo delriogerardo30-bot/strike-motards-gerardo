@@ -937,8 +937,10 @@ function abrirModalProducto(id){
     document.getElementById("modalStock").textContent =
         `Stock disponible: ${producto.stock}`;
 
-    document.getElementById("modalAgregarBtn").onclick = () => {
+    document.getElementById("modalAgregarBtn").onclick = (e) => {
+        e.stopPropagation();
         agregarAlCarrito(producto.id);
+          cerrarModalProducto();
     };
 }
 
