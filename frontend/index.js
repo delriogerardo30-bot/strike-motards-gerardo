@@ -939,7 +939,7 @@ function abrirModalProducto(id){
 
     document.getElementById("modalAgregarBtn").onclick = (e) => {
         e.stopPropagation();
-        agregarAlCarrito(producto.id);
+        addToCart(producto.id);
           cerrarModalProducto();
     };
 }
