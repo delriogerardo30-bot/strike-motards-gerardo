@@ -296,11 +296,21 @@ function renderProducts(productos) {
                             margin-top:12px;
                             font-size:0.92rem;
                             font-weight:700;
-                            color:${agotado ? '#ff5b5b' : '#00d084'};
+                            color:${agotado 
+                                ? '#ff5b5b'
+                                 : stock <= 5
+                                  ? '#ff3b3b'
+                                   : stock <= 10
+                                    ? '#ffb703'
+                                      : '#00d084'};
                         ">
                             ${agotado
-                                ? '❌ Agotado'
-                                : `📦 Stock disponible: ${stock}`
+                                 ? '❌ Agotado'
+                                  : stock <= 5
+                                   ? `🔴 Últimas piezas: ${stock}`
+                                    : stock <= 10
+                                    ? `🟡 Pocas piezas: ${stock}`
+                                    : `🟢 Stock disponible: ${stock}`
                             }
                         </div>
 
