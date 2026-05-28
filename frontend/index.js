@@ -276,7 +276,7 @@ function renderProducts(productos) {
                 stock <= 0;
 
             return `
-                <div class="card">
+                <div class="card" onclick="abrirModalProducto(${p.id})">
 
                     <div class="card-img-wrap">
                         <img src="${imagen}" alt="${nombre}">
@@ -916,7 +916,35 @@ function mostrarSeccion(id) {
         });
     }
 }
+function abrirModalProducto(id){
 
+    const producto = allProducts.find(p => p.id === id);
+
+    if(!producto){
+        console.log("Producto no encontrado");
+        return;
+    }
+
+    document.getElementById("modalProducto").style.display = "flex";
+    document.getElementById("modalImagen").src = producto.imagen_url;
+    document.getElementById("modalCategoria").textContent = producto.categoria;
+    document.getElementById("modalNombre").textContent = producto.nombre;
+    document.getElementById("modalDescripcion").textContent = producto.descripcion;
+
+    document.getElementById("modalPrecio").textContent =
+        `$${Number(producto.precio).toLocaleString("es-MX")}`;
+
+    document.getElementById("modalStock").textContent =
+        `Stock disponible: ${producto.stock}`;
+
+    document.getElementById("modalAgregarBtn").onclick = () => {
+        agregarAlCarrito(producto.id);
+    };
+}
+
+function cerrarModalProducto(){
+    document.getElementById("modalProducto").style.display = "none";
+}
 // ==================== INICIALIZACIÓN ====================
 
 document.addEventListener("DOMContentLoaded", () => {
