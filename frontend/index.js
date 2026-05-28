@@ -328,7 +328,7 @@ function renderProducts(productos) {
 
                             <button
                                 class="btn-add"
-                                onclick="addToCart(${id})"
+                               onclick="event.stopPropagation(); addToCart(${id})"
                                 ${agotado ? "disabled" : ""}
                                 style="
                                     ${agotado
