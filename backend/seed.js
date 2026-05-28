@@ -36,12 +36,12 @@ async function sembrarDatos() {
     console.log('✅ Conexión establecida.');
 
     const datos = [
-      { nombre: "Casco Shark Spartan", descripcion: "Fibra de vidrio con visor solar integrado y aerodinámica avanzada.", precio: 5800, imagen_url: "https://images.unsplash.com/photo-1627435601361-ec25f5b1d0e5?q=80&w=600", categoria: "Cascos", stock: 8 },
-      { nombre: "Casco Fox V3 Motocross", descripcion: "Sistema MIPS y ventilación optimizada para off-road.", precio: 4200, imagen_url: "https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=600", categoria: "Cascos", stock: 10 },
-      { nombre: "Casco HJC RPHA 11", descripcion: "Premium con excelente ventilación y peso ligero.", precio: 6500, imagen_url: "https://images.unsplash.com/photo-1590502593744-8c3a5c9f8a0c?q=80&w=600", categoria: "Cascos", stock: 6 },
-      { nombre: "Casco Arai Corsair-X", descripcion: "Máxima protección y confort profesional.", precio: 9200, imagen_url: "https://images.unsplash.com/photo-1617112848920-5e9c8c8c8c8c?q=80&w=600", categoria: "Cascos", stock: 4 },
-      { nombre: "Casco Shoei NXR2", descripcion: "Alta gama con aislamiento acústico superior.", precio: 8500, imagen_url: "https://images.unsplash.com/photo-1600585154340-be6161a56a9c?q=80&w=600", categoria: "Cascos", stock: 5 },
-      { nombre: "Casco Bell Qualifier", descripcion: "Excelente relación calidad-precio.", precio: 3200, imagen_url: "https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=600", categoria: "Cascos", stock: 12 },
+      { nombre: "Casco Shark Spartan", descripcion: "Fibra de vidrio con visor solar integrado y aerodinámica avanzada.", precio: 5800, imagen_url:'/assets/productos/casco-shark-spartan.jpg', categoria: "Cascos", stock: 8 },
+      { nombre: "Casco Fox V3 Motocross", descripcion: "Sistema MIPS y ventilación optimizada para off-road.", precio: 4200, imagen_url: '/assets/productos/casco-bell-qualifier.jpg', categoria: "Cascos", stock: 10 },
+      { nombre: "Casco HJC RPHA 11", descripcion: "Premium con excelente ventilación y peso ligero.", precio: 6500, imagen_url: '/assets/productos/casco-fox-v3-motocross.jpg', categoria: "Cascos", stock: 6 },
+      { nombre: "Casco Arai Corsair-X", descripcion: "Máxima protección y confort profesional.", precio: 9200, imagen_url: '/assets/productos/casco-hjc-rpha-11.jpg', categoria: "Cascos", stock: 4 },
+      { nombre: "Casco Shoei NXR2", descripcion: "Alta gama con aislamiento acústico superior.", precio: 8500, imagen_url: '/assets/productos/casco-arai-corsair-x.jpg', categoria: "Cascos", stock: 5 },
+      { nombre: "Casco Bell Qualifier", descripcion: "Excelente relación calidad-precio.", precio: 3200, imagen_url: '/assets/productos/casco-shoei-nxr2.jpg', categoria: "Cascos", stock: 12 },
 
       { nombre: "Chamarra Alpine Tech", descripcion: "Protección nivel 2 con ventilación regulable.", precio: 4950, imagen_url: "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?q=80&w=600", categoria: "Ropa", stock: 7 },
       { nombre: "Protector Espalda Pro", descripcion: "Nivel máximo de seguridad ergonómico.", precio: 1100, imagen_url: "https://images.unsplash.com/photo-1444858291040-58f756a3bdd6?q=80&w=600", categoria: "Ropa", stock: 15 },
