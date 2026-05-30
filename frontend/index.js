@@ -558,6 +558,11 @@ function removeFromCart(index) {
 
 function toggleCart() {
 
+    if (cart.length === 0) {
+        showToast("Tu carrito está vacío. Agrega al menos un producto.");
+        return;
+    }
+
     const modal =
         document.getElementById("cart-modal");
 
@@ -571,7 +576,9 @@ function toggleCart() {
     if (modal.style.display === "flex") {
         renderCart();
     }
-}// ==================== CHECKOUT CON VALIDACIÓN ====================
+}
+
+// ==================== CHECKOUT CON VALIDACIÓN ====================
 
 function showCheckout() {
 
