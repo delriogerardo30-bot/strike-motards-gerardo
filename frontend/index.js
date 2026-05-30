@@ -115,6 +115,15 @@ async function cargarProductos() {
     }
 }// ==================== FILTROS Y BÚSQUEDA ====================
 
+function normalizarCategoria(texto) {
+    return (texto || "")
+        .toString()
+        .trim()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+}
+
 function renderFilters() {
 
     const container =
@@ -125,23 +134,11 @@ function renderFilters() {
 
     if (!container || !searchInput) return;
 
-    const categoriasBackend =
-        allProducts
-            .map(p => p.categoria || "Accesorios")
-            .filter(Boolean);
-
     const ordenBase =
         ["Todos", "Cascos", "Ropa", "Accesorios", "Calzado", "Tecnología"];
 
-    const otrasCategorias =
-        [...new Set(categoriasBackend)]
-            .filter(cat => !ordenBase.includes(cat));
-
-    const categories =
-        [...ordenBase, ...otrasCategorias];
-
     container.innerHTML =
-        categories.map(cat => `
+        ordenBase.map(cat => `
             <div
                 class="category-chip ${cat === "Todos" ? "active" : ""}"
                 data-category="${escapeHTML(cat)}"
@@ -167,7 +164,7 @@ function renderFilters() {
 
         });
 
-    searchInput.addEventListener("input", filterProducts);
+    searchInput.oninput = filterProducts;
 }
 
 function filterProducts() {
@@ -191,7 +188,8 @@ function filterProducts() {
 
         filtered =
             filtered.filter(p =>
-                (p.categoria || "Accesorios") === activeCategory
+                normalizarCategoria(p.categoria) ===
+                normalizarCategoria(activeCategory)
             );
     }
 
