@@ -597,9 +597,10 @@ function showCheckout() {
                 type="text"
                 id="cliente-nombre"
                 placeholder="Nombre completo *"
+                maxlength="50"
             >
             <div class="checkout-error" id="error-nombre">
-                Ingresa un nombre válido de al menos 3 letras.
+                Ingresa un nombre válido entre 3 y 50 caracteres.
             </div>
 
             <input
@@ -615,10 +616,11 @@ function showCheckout() {
             <textarea
                 id="cliente-direccion"
                 rows="4"
+                maxlength="120"
                 placeholder="Dirección de envío: calle, colonia, ciudad y CP *"
             ></textarea>
             <div class="checkout-error" id="error-direccion">
-                Ingresa una dirección válida de al menos 10 caracteres.
+                La dirección debe tener entre 10 y 120 caracteres.
             </div>
 
             <div class="checkout-total">
@@ -723,7 +725,7 @@ async function confirmOrder() {
 
     let valido = true;
 
-    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,}$/.test(nombre)) {
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,50}$/.test(nombre)) {
         setCheckoutError("cliente-nombre", "error-nombre");
         valido = false;
     }
@@ -733,7 +735,7 @@ async function confirmOrder() {
         valido = false;
     }
 
-    if (direccion.length < 10) {
+    if (direccion.length < 10 || direccion.length > 120) {
         setCheckoutError("cliente-direccion", "error-direccion");
         valido = false;
     }
