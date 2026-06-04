@@ -751,6 +751,14 @@ async function confirmOrder() {
 
     if (!valido) return;
 
+    /* =========================
+       ABRIR PESTAÑA WHATSAPP
+       ANTES DE LAS PETICIONES
+    ========================= */
+
+    const whatsappWindow =
+        window.open("", "_blank");
+
     try {
 
         const respuesta =
@@ -774,6 +782,11 @@ async function confirmOrder() {
             await respuesta.json();
 
         if (!respuesta.ok) {
+
+            if (whatsappWindow) {
+                whatsappWindow.close();
+            }
+
             alert(resultado.error || "No se pudo registrar el pedido");
             return;
         }
@@ -827,6 +840,7 @@ async function confirmOrder() {
             document.createElement("a");
 
         link.href = ticketUrl;
+
         link.download =
             `ticket-strike-motards-${resultado.pedido_id}.pdf`;
 
@@ -835,16 +849,18 @@ async function confirmOrder() {
         document.body.removeChild(link);
 
         /* =========================
-           MENSAJE WHATSAPP
+           WHATSAPP
         ========================= */
 
         mensaje += "\n\n📄 El ticket PDF se descargó automáticamente.";
         mensaje += "\nAdjunta ese PDF en este chat para confirmar tu pedido.";
 
-        const url =
+        const whatsappUrl =
             `https://wa.me/527292529554?text=${encodeURIComponent(mensaje)}`;
 
-        window.open(url, "_blank");
+        if (whatsappWindow) {
+            whatsappWindow.location.href = whatsappUrl;
+        }
 
         closeCheckout();
 
@@ -861,15 +877,27 @@ async function confirmOrder() {
         }
 
         productsLoaded = false;
+
         await cargarProductos();
 
-        showToast("Pedido registrado, PDF generado y WhatsApp abierto");
+        showToast(
+            "Pedido registrado, PDF generado y WhatsApp abierto"
+        );
 
     } catch (error) {
 
-        console.error("Error al registrar pedido:", error);
+        if (whatsappWindow) {
+            whatsappWindow.close();
+        }
 
-        alert("Ocurrió un error al registrar el pedido. Intenta de nuevo.");
+        console.error(
+            "Error al registrar pedido:",
+            error
+        );
+
+        alert(
+            "Ocurrió un error al registrar el pedido. Intenta de nuevo."
+        );
     }
 }
 
