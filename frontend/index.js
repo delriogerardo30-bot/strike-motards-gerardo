@@ -558,24 +558,28 @@ function removeFromCart(index) {
 
 function toggleCart() {
 
-    if (cart.length === 0) {
-        showToast("Tu carrito está vacío. Agrega al menos un producto.");
-        return;
-    }
-
     const modal =
         document.getElementById("cart-modal");
 
     if (!modal) return;
 
-    modal.style.display =
-        modal.style.display === "flex"
-            ? "none"
-            : "flex";
+    const estaAbierto =
+        modal.style.display === "flex";
 
-    if (modal.style.display === "flex") {
-        renderCart();
+    // Si el carrito ya está abierto, dejar cerrarlo aunque esté vacío
+    if (estaAbierto) {
+        modal.style.display = "none";
+        return;
     }
+
+    // Si está cerrado y no hay productos, no abrirlo
+    if (cart.length === 0) {
+        showToast("Tu carrito está vacío. Agrega al menos un producto.");
+        return;
+    }
+
+    modal.style.display = "flex";
+    renderCart();
 }
 
 // ==================== CHECKOUT CON VALIDACIÓN ====================
