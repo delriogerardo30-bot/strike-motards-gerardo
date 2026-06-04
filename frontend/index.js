@@ -780,7 +780,7 @@ async function confirmOrder() {
 
         let mensaje = "";
 
-        mensaje += "COMANDA DE PEDIDO - STRIKE MOTARDS\n";
+        mensaje += "🏍️ COMANDA DE PEDIDO - STRIKE MOTARDS\n";
         mensaje += "━━━━━━━━━━━━━━━━━━━━\n\n";
 
         mensaje += `Pedido: #${resultado.pedido_id}\n`;
@@ -816,6 +816,31 @@ async function confirmOrder() {
         mensaje += "━━━━━━━━━━━━━━━━━━━━\n";
         mensaje += "\nEstado: Pendiente de confirmación";
 
+        /* =========================
+           DESCARGAR PDF
+        ========================= */
+
+        const ticketUrl =
+            `${API_URL}/pedidos/${resultado.pedido_id}/ticket`;
+
+        const link =
+            document.createElement("a");
+
+        link.href = ticketUrl;
+        link.download =
+            `ticket-strike-motards-${resultado.pedido_id}.pdf`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        /* =========================
+           MENSAJE WHATSAPP
+        ========================= */
+
+        mensaje += "\n\n📄 El ticket PDF se descargó automáticamente.";
+        mensaje += "\nAdjunta ese PDF en este chat para confirmar tu pedido.";
+
         const url =
             `https://wa.me/527292529554?text=${encodeURIComponent(mensaje)}`;
 
@@ -838,7 +863,7 @@ async function confirmOrder() {
         productsLoaded = false;
         await cargarProductos();
 
-        showToast("Pedido registrado y enviado por WhatsApp");
+        showToast("Pedido registrado, PDF generado y WhatsApp abierto");
 
     } catch (error) {
 

@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const { Sequelize, DataTypes } = require('sequelize');
+const PDFDocument = require('pdfkit');
 
 const app = express();
 
@@ -291,6 +292,105 @@ app.get('/pedidos', async (req, res) => {
   } catch (err) {
     console.error('Error al obtener pedidos:', err);
     res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+/* =========================
+   GENERAR TICKET PDF
+========================= */
+app.get('/pedidos/:id/ticket', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const pedido = await Pedido.findByPk(id, {
+      include: [
+        {
+          model: DetallePedido,
+          as: 'detalles'
+        }
+      ]
+    });
+
+    if (!pedido) {
+      return res.status(404).json({
+        error: 'Pedido no encontrado'
+      });
+    }
+
+    const doc = new PDFDocument({
+      size: 'A4',
+      margin: 50
+    });
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=ticket-strike-motards-${pedido.id}.pdf`
+    );
+
+    doc.pipe(res);
+
+    doc
+      .fontSize(22)
+      .text('STRIKE MOTARDS', { align: 'center' });
+
+    doc
+      .fontSize(12)
+      .text('Ticket de pedido', { align: 'center' });
+
+    doc.moveDown();
+
+    doc
+      .fontSize(12)
+      .text(`Pedido: #${pedido.id}`)
+      .text(`Fecha: ${new Date(pedido.fecha).toLocaleString('es-MX')}`)
+      .text(`Cliente: ${pedido.nombre_cliente}`)
+      .text(`Teléfono: ${pedido.telefono}`)
+      .text(`Dirección: ${pedido.direccion}`)
+      .text(`Estado: ${pedido.estado}`);
+
+    doc.moveDown();
+
+    doc
+      .fontSize(14)
+      .text('Productos:', { underline: true });
+
+    doc.moveDown(0.5);
+
+    pedido.detalles.forEach((detalle, index) => {
+      doc
+        .fontSize(11)
+        .text(`${index + 1}. ${detalle.nombre_producto}`)
+        .text(`Cantidad: ${detalle.cantidad}`)
+        .text(`Precio unitario: $${Number(detalle.precio_unitario).toLocaleString('es-MX')} MXN`)
+        .text(`Subtotal: $${Number(detalle.subtotal).toLocaleString('es-MX')} MXN`);
+
+      doc.moveDown(0.7);
+    });
+
+    doc.moveDown();
+
+    doc
+      .fontSize(16)
+      .text(`TOTAL: $${Number(pedido.total).toLocaleString('es-MX')} MXN`, {
+        align: 'right'
+      });
+
+    doc.moveDown();
+
+    doc
+      .fontSize(10)
+      .text('Gracias por comprar en Strike Motards.', {
+        align: 'center'
+      });
+
+    doc.end();
+
+  } catch (err) {
+    console.error('Error al generar ticket PDF:', err);
+
+    res.status(500).json({
+      error: 'Error al generar el ticket PDF'
+    });
   }
 });
 /* =========================
