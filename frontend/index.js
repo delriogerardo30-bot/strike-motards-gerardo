@@ -751,11 +751,6 @@ async function confirmOrder() {
 
     if (!valido) return;
 
-    /* =========================
-       ABRIR PESTAÑA WHATSAPP
-       ANTES DE LAS PETICIONES
-    ========================= */
-
     const whatsappWindow =
         window.open("", "_blank");
 
@@ -793,13 +788,13 @@ async function confirmOrder() {
 
         let mensaje = "";
 
-        mensaje += "🏍️ COMANDA DE PEDIDO - STRIKE MOTARDS\n";
-        mensaje += "━━━━━━━━━━━━━━━━━━━━\n\n";
+        mensaje += "COMANDA DE PEDIDO - STRIKE MOTARDS\n";
+        mensaje += "----------------------------------\n\n";
 
         mensaje += `Pedido: #${resultado.pedido_id}\n`;
         mensaje += `Cliente: ${nombre}\n`;
-        mensaje += `Teléfono: ${telefono}\n`;
-        mensaje += `Dirección: ${direccion}\n\n`;
+        mensaje += `Telefono: ${telefono}\n`;
+        mensaje += `Direccion: ${direccion}\n\n`;
 
         mensaje += "PRODUCTOS:\n";
 
@@ -824,14 +819,10 @@ async function confirmOrder() {
             total += subtotal;
         });
 
-        mensaje += "\n━━━━━━━━━━━━━━━━━━━━\n";
+        mensaje += "\n----------------------------------\n";
         mensaje += `TOTAL: $${total.toLocaleString("es-MX")} MXN\n`;
-        mensaje += "━━━━━━━━━━━━━━━━━━━━\n";
-        mensaje += "\nEstado: Pendiente de confirmación";
-
-        /* =========================
-           DESCARGAR PDF
-        ========================= */
+        mensaje += "----------------------------------\n";
+        mensaje += "\nEstado: Pendiente de confirmacion";
 
         const ticketUrl =
             `${API_URL}/pedidos/${resultado.pedido_id}/ticket`;
@@ -840,7 +831,6 @@ async function confirmOrder() {
             document.createElement("a");
 
         link.href = ticketUrl;
-
         link.download =
             `ticket-strike-motards-${resultado.pedido_id}.pdf`;
 
@@ -848,18 +838,20 @@ async function confirmOrder() {
         link.click();
         document.body.removeChild(link);
 
-        /* =========================
-           WHATSAPP
-        ========================= */
+        const ticketLinkPublico =
+            `https://backend-strike-motards.onrender.com/pedidos/${resultado.pedido_id}/ticket`;
 
-        mensaje += "\n\n📄 El ticket PDF se descargó automáticamente.";
-        mensaje += "\nAdjunta ese PDF en este chat para confirmar tu pedido.";
+        mensaje += "\n\nTICKET PDF:";
+        mensaje += `\n${ticketLinkPublico}`;
+        mensaje += "\n\nSi el PDF no aparece adjunto, puedes abrirlo desde el enlace anterior.";
 
         const whatsappUrl =
             `https://wa.me/527292529554?text=${encodeURIComponent(mensaje)}`;
 
         if (whatsappWindow) {
             whatsappWindow.location.href = whatsappUrl;
+        } else {
+            window.location.href = whatsappUrl;
         }
 
         closeCheckout();
@@ -880,9 +872,7 @@ async function confirmOrder() {
 
         await cargarProductos();
 
-        showToast(
-            "Pedido registrado, PDF generado y WhatsApp abierto"
-        );
+        showToast("Pedido registrado, PDF generado y WhatsApp abierto");
 
     } catch (error) {
 
@@ -890,14 +880,9 @@ async function confirmOrder() {
             whatsappWindow.close();
         }
 
-        console.error(
-            "Error al registrar pedido:",
-            error
-        );
+        console.error("Error al registrar pedido:", error);
 
-        alert(
-            "Ocurrió un error al registrar el pedido. Intenta de nuevo."
-        );
+        alert("Ocurrió un error al registrar el pedido. Intenta de nuevo.");
     }
 }
 
