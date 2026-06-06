@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const { Sequelize, DataTypes } = require('sequelize');
 const PDFDocument = require('pdfkit');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 
@@ -123,6 +124,35 @@ const DetallePedido = sequelize.define('DetallePedido', {
   }
 }, {
   tableName: 'detalle_pedidos',
+  timestamps: false
+});
+/* =========================
+   MODELO USUARIOS
+========================= */
+const Usuario = sequelize.define('Usuario', {
+  nombre: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  telefono: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  correo: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+  password: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  fecha_registro: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  }
+}, {
+  tableName: 'usuarios',
   timestamps: false
 });
 
@@ -553,6 +583,131 @@ app.delete('/admin/productos/:id', async (req, res) => {
   } catch (err) {
     console.error('Error al eliminar producto:', err);
     res.status(500).json({ error: 'Error al eliminar producto' });
+  }
+});
+/* =========================
+   REGISTRO DE USUARIO
+========================= */
+app.post('/usuarios/registro', async (req, res) => {
+  try {
+    const { nombre, telefono, correo, password } = req.body;
+
+    if (!nombre || !telefono || !correo || !password) {
+      return res.status(400).json({
+        error: 'Todos los campos son obligatorios'
+      });
+    }
+
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,50}$/.test(nombre)) {
+      return res.status(400).json({
+        error: 'Nombre inválido'
+      });
+    }
+
+    if (!/^\d{10}$/.test(telefono)) {
+      return res.status(400).json({
+        error: 'El teléfono debe tener 10 dígitos'
+      });
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
+      return res.status(400).json({
+        error: 'Correo inválido'
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        error: 'La contraseña debe tener mínimo 6 caracteres'
+      });
+    }
+
+    const usuarioExistente = await Usuario.findOne({
+      where: { correo }
+    });
+
+    if (usuarioExistente) {
+      return res.status(400).json({
+        error: 'Este correo ya está registrado'
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const nuevoUsuario = await Usuario.create({
+      nombre,
+      telefono,
+      correo,
+      password: passwordHash
+    });
+
+    res.status(201).json({
+      mensaje: 'Usuario registrado correctamente',
+      usuario: {
+        id: nuevoUsuario.id,
+        nombre: nuevoUsuario.nombre,
+        telefono: nuevoUsuario.telefono,
+        correo: nuevoUsuario.correo
+      }
+    });
+
+  } catch (err) {
+    console.error('Error al registrar usuario:', err);
+
+    res.status(500).json({
+      error: 'Error al registrar usuario'
+    });
+  }
+});
+
+/* =========================
+   LOGIN DE USUARIO
+========================= */
+app.post('/usuarios/login', async (req, res) => {
+  try {
+    const { correo, password } = req.body;
+
+    if (!correo || !password) {
+      return res.status(400).json({
+        error: 'Correo y contraseña son obligatorios'
+      });
+    }
+
+    const usuario = await Usuario.findOne({
+      where: { correo }
+    });
+
+    if (!usuario) {
+      return res.status(401).json({
+        error: 'Correo o contraseña incorrectos'
+      });
+    }
+
+    const passwordCorrecta =
+      await bcrypt.compare(password, usuario.password);
+
+    if (!passwordCorrecta) {
+      return res.status(401).json({
+        error: 'Correo o contraseña incorrectos'
+      });
+    }
+
+    res.json({
+      mensaje: 'Inicio de sesión correcto',
+      usuario: {
+        id: usuario.id,
+        nombre: usuario.nombre,
+        telefono: usuario.telefono,
+        correo: usuario.correo
+      }
+    });
+
+  } catch (err) {
+    console.error('Error al iniciar sesión:', err);
+
+    res.status(500).json({
+      error: 'Error al iniciar sesión'
+    });
   }
 });
 /* =========================

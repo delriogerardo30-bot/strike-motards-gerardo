@@ -669,12 +669,20 @@ function showCheckout() {
 
     document.body.appendChild(modal);
 
-    const telefonoInput =
-        document.getElementById("cliente-telefono");
+    const nombreInput =
+    document.getElementById("cliente-nombre");
 
-    telefonoInput.addEventListener("input", function () {
-        this.value = this.value.replace(/[^0-9]/g, "");
-    });
+const telefonoInput =
+    document.getElementById("cliente-telefono");
+
+if (usuarioActual) {
+    nombreInput.value = usuarioActual.nombre || "";
+    telefonoInput.value = usuarioActual.telefono || "";
+}
+
+telefonoInput.addEventListener("input", function () {
+    this.value = this.value.replace(/[^0-9]/g, "");
+});
 }
 
 function closeCheckout() {
@@ -978,4 +986,206 @@ function cerrarModalProducto(){
 
 document.addEventListener("DOMContentLoaded", () => {
     updateCartCount();
+    cargarUsuarioGuardado();
 });
+/* =========================
+   LOGIN / REGISTRO
+========================= */
+
+let authMode = "login";
+let usuarioActual = null;
+
+function openUserModal() {
+
+    const modal =
+        document.getElementById("user-modal");
+
+    if (modal) {
+        modal.style.display = "flex";
+    }
+}
+
+function closeUserModal() {
+
+    const modal =
+        document.getElementById("user-modal");
+
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+
+function toggleAuthMode() {
+
+    authMode =
+        authMode === "login"
+            ? "register"
+            : "login";
+
+    const title =
+        document.getElementById("auth-title");
+
+    const registerFields =
+        document.getElementById("register-fields");
+
+    const toggleText =
+        document.getElementById("auth-toggle-text");
+
+    if (authMode === "register") {
+
+        title.textContent =
+            "Crear Cuenta";
+
+        registerFields.style.display =
+            "block";
+
+        toggleText.textContent =
+            "¿Ya tienes cuenta? Inicia sesión";
+
+    } else {
+
+        title.textContent =
+            "Iniciar sesión";
+
+        registerFields.style.display =
+            "none";
+
+        toggleText.textContent =
+            "¿No tienes cuenta? Regístrate";
+    }
+}async function submitAuthForm() {
+
+    const correo =
+        document.getElementById("auth-correo").value.trim();
+
+    const password =
+        document.getElementById("auth-password").value.trim();
+
+    const nombre =
+        document.getElementById("auth-nombre")?.value.trim();
+
+    const telefono =
+        document.getElementById("auth-telefono")?.value.trim();
+
+    if (!correo || !password) {
+        alert("Correo y contraseña son obligatorios");
+        return;
+    }
+
+    if (authMode === "register") {
+
+        if (!nombre || !telefono) {
+            alert("Nombre y teléfono son obligatorios");
+            return;
+        }
+
+        if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,50}$/.test(nombre)) {
+            alert("Ingresa un nombre válido");
+            return;
+        }
+
+        if (!/^\d{10}$/.test(telefono)) {
+            alert("El teléfono debe tener 10 dígitos");
+            return;
+        }
+    }
+
+    try {
+
+        const endpoint =
+            authMode === "login"
+                ? "/usuarios/login"
+                : "/usuarios/registro";
+
+        const body =
+            authMode === "login"
+                ? { correo, password }
+                : { nombre, telefono, correo, password };
+
+        const respuesta =
+            await fetch(`${API_URL}${endpoint}`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(body)
+            });
+
+        const data =
+            await respuesta.json();
+
+        if (!respuesta.ok) {
+            alert(data.error || "Error al procesar la solicitud");
+            return;
+        }
+
+        usuarioActual =
+            data.usuario;
+
+        localStorage.setItem(
+            "strikeUser",
+            JSON.stringify(usuarioActual)
+        );
+
+        actualizarBotonUsuario();
+
+        closeUserModal();
+
+        showToast(
+            authMode === "login"
+                ? "Sesión iniciada correctamente"
+                : "Cuenta creada correctamente"
+        );
+
+    } catch (error) {
+
+        console.error("Error de usuario:", error);
+
+        alert("Error al conectar con el servidor");
+    }
+}
+
+function actualizarBotonUsuario() {
+
+    const userBtn =
+        document.getElementById("user-btn");
+
+    if (!userBtn) return;
+
+    if (usuarioActual) {
+        userBtn.textContent =
+            `👤 ${usuarioActual.nombre.split(" ")[0]}`;
+    } else {
+        userBtn.textContent =
+            "👤 Iniciar sesión";
+    }
+}
+
+function cargarUsuarioGuardado() {
+
+    const usuarioGuardado =
+        localStorage.getItem("strikeUser");
+
+    if (!usuarioGuardado) return;
+
+    try {
+        usuarioActual =
+            JSON.parse(usuarioGuardado);
+
+        actualizarBotonUsuario();
+
+    } catch (error) {
+        localStorage.removeItem("strikeUser");
+    }
+}
+
+function logoutUsuario() {
+
+    usuarioActual = null;
+
+    localStorage.removeItem("strikeUser");
+
+    actualizarBotonUsuario();
+
+    showToast("Sesión cerrada");
+}
