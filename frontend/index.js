@@ -843,7 +843,7 @@ async function confirmOrder() {
 
         mensaje += "\n\nTICKET PDF:";
         mensaje += `\n${ticketLinkPublico}`;
-        mensaje += "\n\nSi el PDF no aparece adjunto, puedes abrirlo desde el enlace anterior.";
+        mensaje += "\n\n PDF descargado automaticamente y enlace de este mismo adjunto, puedes abrirlo desde el enlace anterior.";
 
         const whatsappUrl =
             `https://wa.me/527292529554?text=${encodeURIComponent(mensaje)}`;
