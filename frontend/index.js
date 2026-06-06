@@ -985,8 +985,21 @@ function cerrarModalProducto(){
 // ==================== INICIALIZACIÓN ====================
 
 document.addEventListener("DOMContentLoaded", () => {
+
     updateCartCount();
+
     cargarUsuarioGuardado();
+
+    setTimeout(() => {
+
+        if (!usuarioActual) {
+
+            openUserModal();
+
+        }
+
+    }, 700);
+
 });
 /* =========================
    LOGIN / REGISTRO
@@ -996,6 +1009,20 @@ let authMode = "login";
 let usuarioActual = null;
 
 function openUserModal() {
+
+    if (usuarioActual) {
+
+        const cerrar =
+            confirm(
+                `Sesión iniciada como ${usuarioActual.nombre}\n\n¿Deseas cerrar sesión?`
+            );
+
+        if (cerrar) {
+            logoutUsuario();
+        }
+
+        return;
+    }
 
     const modal =
         document.getElementById("user-modal");
@@ -1025,6 +1052,9 @@ function toggleAuthMode() {
     const title =
         document.getElementById("auth-title");
 
+    const subtitle =
+        document.getElementById("auth-subtitle");
+
     const registerFields =
         document.getElementById("register-fields");
 
@@ -1034,7 +1064,10 @@ function toggleAuthMode() {
     if (authMode === "register") {
 
         title.textContent =
-            "Crear Cuenta";
+            "Crear cuenta";
+
+        subtitle.textContent =
+            "Regístrate para guardar tus datos y comprar más rápido.";
 
         registerFields.style.display =
             "block";
@@ -1047,104 +1080,16 @@ function toggleAuthMode() {
         title.textContent =
             "Iniciar sesión";
 
+        subtitle.textContent =
+            "Ingresa con tu correo y contraseña.";
+
         registerFields.style.display =
             "none";
 
         toggleText.textContent =
             "¿No tienes cuenta? Regístrate";
     }
-}async function submitAuthForm() {
-
-    const correo =
-        document.getElementById("auth-correo").value.trim();
-
-    const password =
-        document.getElementById("auth-password").value.trim();
-
-    const nombre =
-        document.getElementById("auth-nombre")?.value.trim();
-
-    const telefono =
-        document.getElementById("auth-telefono")?.value.trim();
-
-    if (!correo || !password) {
-        alert("Correo y contraseña son obligatorios");
-        return;
-    }
-
-    if (authMode === "register") {
-
-        if (!nombre || !telefono) {
-            alert("Nombre y teléfono son obligatorios");
-            return;
-        }
-
-        if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,50}$/.test(nombre)) {
-            alert("Ingresa un nombre válido");
-            return;
-        }
-
-        if (!/^\d{10}$/.test(telefono)) {
-            alert("El teléfono debe tener 10 dígitos");
-            return;
-        }
-    }
-
-    try {
-
-        const endpoint =
-            authMode === "login"
-                ? "/usuarios/login"
-                : "/usuarios/registro";
-
-        const body =
-            authMode === "login"
-                ? { correo, password }
-                : { nombre, telefono, correo, password };
-
-        const respuesta =
-            await fetch(`${API_URL}${endpoint}`, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(body)
-            });
-
-        const data =
-            await respuesta.json();
-
-        if (!respuesta.ok) {
-            alert(data.error || "Error al procesar la solicitud");
-            return;
-        }
-
-        usuarioActual =
-            data.usuario;
-
-        localStorage.setItem(
-            "strikeUser",
-            JSON.stringify(usuarioActual)
-        );
-
-        actualizarBotonUsuario();
-
-        closeUserModal();
-
-        showToast(
-            authMode === "login"
-                ? "Sesión iniciada correctamente"
-                : "Cuenta creada correctamente"
-        );
-
-    } catch (error) {
-
-        console.error("Error de usuario:", error);
-
-        alert("Error al conectar con el servidor");
-    }
 }
-
 function actualizarBotonUsuario() {
 
     const userBtn =
@@ -1187,5 +1132,5 @@ function logoutUsuario() {
 
     actualizarBotonUsuario();
 
-    showToast("Sesión cerrada");
+    showToast("Sesión cerrada correctamente");
 }
