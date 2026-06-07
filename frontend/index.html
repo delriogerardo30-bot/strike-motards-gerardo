@@ -243,17 +243,21 @@
             animation: bgPulse 6s ease-in-out infinite;
         }
 
-        #inicio::after {
-            content: "";
-            position: absolute;
-            width: 520px;
-            height: 520px;
-            right: -160px;
-            bottom: -150px;
-            background: radial-gradient(circle, rgba(255,47,47,0.25), transparent 65%);
-            filter: blur(4px);
-            pointer-events: none;
-        }
+       #inicio::after {
+    content: "";
+    position: absolute;
+    width: 620px;
+    height: 620px;
+    right: -180px;
+    bottom: -180px;
+    background: radial-gradient(
+        circle,
+        rgba(255, 47, 47, 0.34),
+        transparent 65%
+    );
+    filter: blur(6px);
+    pointer-events: none;
+}
 
         @keyframes bgPulse {
             0%, 100% {
@@ -294,21 +298,34 @@
         }
 
         #inicio h1 span {
-            color: transparent;
-            background: linear-gradient(135deg, #ffffff, #ff6b35, #ff2f2f);
-            background-clip: text;
-            -webkit-background-clip: text;
-        }
-
+    color: transparent;
+    background: linear-gradient(135deg, #ffffff, #ff6b35, #ff2f2f, #a80000);
+    background-size: 220% 220%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    animation: gradientMove 4s ease infinite;
+}
+@keyframes gradientMove {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
         #inicio p {
-            font-size: 1.25rem;
-            max-width: 650px;
-            margin: 22px 0 32px;
-            color: #d9e3e7;
-            z-index: 1;
-            line-height: 1.65;
-            animation: heroText 1s ease both;
-        }
+    font-size: 1.25rem;
+    max-width: 720px;
+    margin: 24px auto 34px;
+    color: #d9e3e7;
+    z-index: 1;
+    line-height: 1.65;
+    text-align: center;
+    animation: heroText 1s ease both;
+}
 
         @keyframes heroText {
             from {
@@ -322,12 +339,14 @@
         }
 
         .hero-actions {
-            display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-            z-index: 1;
-            animation: heroText 1.15s ease both;
-        }
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    z-index: 1;
+}
 
         .btn-primary {
             padding: 16px 40px;
@@ -365,14 +384,14 @@
         }
 
         .hero-stats {
-            z-index: 1;
-            display: flex;
-            gap: 14px;
-            flex-wrap: wrap;
-            margin-top: 36px;
-            animation: heroText 1.3s ease both;
-        }
-
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-top: 40px;
+    z-index: 1;
+}
         .hero-stat {
             min-width: 150px;
             padding: 16px 18px;
@@ -1339,13 +1358,20 @@
                 font-size: 0.9rem;
             }
 
-            #inicio {
-                align-items: center;
-                text-align: center;
-                padding: 80px 6%;
-                min-height: 82vh;
-            }
-
+#inicio {
+    min-height: 88vh;
+    background:
+        linear-gradient(90deg, rgba(2,6,8,0.96), rgba(7,20,26,0.78), rgba(2,6,8,0.96)),
+        url('https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=2070') center/cover;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 90px 7%;
+    position: relative;
+    overflow: hidden;
+}
             #inicio::before {
                 background-size: 420px;
             }
@@ -1427,9 +1453,17 @@
                 font-size: 0.68rem;
             }
 
-            #inicio h1 {
-                font-size: 3rem;
-            }
+ #inicio h1 {
+    font-size: clamp(3.5rem,8vw,7rem);
+    line-height: 0.9;
+    font-weight: 900;
+    max-width: 980px;
+    z-index: 1;
+    letter-spacing: -3px;
+    text-align: center;
+    text-shadow: 0 14px 40px rgba(0,0,0,0.65);
+    animation: heroText 0.8s ease both;
+}
 
             #inicio p {
                 font-size: 1rem;
