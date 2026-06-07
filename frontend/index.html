@@ -419,9 +419,11 @@
     border: 1px solid var(--border);
     box-shadow: var(--shadow);
     transition: 0.35s ease;
-
     display: flex;
     align-items: stretch;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .feature-card:hover {
@@ -1722,29 +1724,26 @@
 
     <div class="featured-categories">
 
-        <div class="feature-card" onclick="irCategoriaDestacada('Cascos')"
-            <img src="assets/productos/casco-shoei-nxr2.jpg" alt="Cascos">
-            <div class="feature-card-content">
-                <h3>Cascos</h3>
-                <p>Protección de primera calidad.</p>
-            </div>
-        </div>
+<div class="feature-card" style="background-image: url('assets/productos/casco-shoei-nxr2.jpg');" onclick="irCategoriaDestacada('Cascos')">
+    <div class="feature-card-content">
+        <h3>Cascos</h3>
+        <p>Protección de primera calidad.</p>
+    </div>
+</div>
 
-        <div class="feature-card" onclick="irCategoriaDestacada('Ropa')"
-            <img src="assets/productos/casco-hjc-rpha-11.jpg" alt="Ropa">
-            <div class="feature-card-content">
-                <h3>Ropa</h3>
-                <p>Estilo motard para cada ruta.</p>
-            </div>
-        </div>
+<div class="feature-card" style="background-image: url('assets/productos/casco-hjc-rpha-11.jpg');" onclick="irCategoriaDestacada('Ropa')">
+    <div class="feature-card-content">
+        <h3>Ropa</h3>
+        <p>Estilo motard para cada ruta.</p>
+    </div>
+</div>
 
-        <div class="feature-card" onclick="irCategoriaDestacada('Accesorios')"
-            <img src="assets/productos/casco-shark-spartan.jpg" alt="Accesorios">
-            <div class="feature-card-content">
-                <h3>Accesorios</h3>
-                <p>Mejora tu experiencia sobre dos ruedas.</p>
-            </div>
-        </div>
+<div class="feature-card" style="background-image: url('assets/productos/casco-shark-spartan.jpg');" onclick="irCategoriaDestacada('Accesorios')">
+    <div class="feature-card-content">
+        <h3>Accesorios</h3>
+        <p>Mejora tu experiencia sobre dos ruedas.</p>
+    </div>
+</div>
 
     </div>
 
