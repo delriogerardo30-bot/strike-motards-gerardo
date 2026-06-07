@@ -931,6 +931,10 @@ function mostrarSeccion(id) {
         .forEach(sec => sec.classList.remove("active"));
 
     section.classList.add("active");
+    document.querySelectorAll(".home-only")
+    .forEach(sec => {
+        sec.style.display = id === "inicio" ? "block" : "none";
+    });
 
     if (id === "tienda") {
 
@@ -950,6 +954,28 @@ function mostrarSeccion(id) {
             behavior: "smooth"
         });
     }
+}
+function irCategoriaDestacada(categoria) {
+
+    mostrarSeccion("tienda");
+
+    setTimeout(() => {
+
+        const chips =
+            document.querySelectorAll(".category-chip");
+
+        chips.forEach(chip => {
+
+            if (
+                chip.dataset.category &&
+                normalizarCategoria(chip.dataset.category) === normalizarCategoria(categoria)
+            ) {
+                chip.click();
+            }
+
+        });
+
+    }, 400);
 }
 function abrirModalProducto(id){
 
