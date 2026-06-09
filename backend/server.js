@@ -4,7 +4,10 @@ const express = require('express');
 const cors = require('cors');
 const { Sequelize, DataTypes } = require('sequelize');
 const PDFDocument = require('pdfkit');
+const QRCode = require('qrcode');
 const bcrypt = require('bcryptjs');
+const fs = require('fs');
+const path = require('path');
 
 const app = express();
 
@@ -325,7 +328,7 @@ app.get('/pedidos', async (req, res) => {
   }
 });
 /* =========================
-   GENERAR TICKET PDF
+   GENERAR TICKET PDF PREMIUM
 ========================= */
 app.get('/pedidos/:id/ticket', async (req, res) => {
   try {
@@ -348,7 +351,7 @@ app.get('/pedidos/:id/ticket', async (req, res) => {
 
     const doc = new PDFDocument({
       size: 'A4',
-      margin: 50
+      margin: 0
     });
 
     res.setHeader('Content-Type', 'application/pdf');
@@ -359,57 +362,370 @@ app.get('/pedidos/:id/ticket', async (req, res) => {
 
     doc.pipe(res);
 
-    doc
-      .fontSize(22)
-      .text('STRIKE MOTARDS', { align: 'center' });
+    const pageWidth = doc.page.width;
+    const pageHeight = doc.page.height;
 
-    doc
-      .fontSize(12)
-      .text('Ticket de pedido', { align: 'center' });
+    const rojo = '#FF3B33';
+    const rojoOscuro = '#B91515';
+    const negro = '#05090B';
+    const negro2 = '#0B1518';
+    const gris = '#9CA3AF';
+    const blanco = '#FFFFFF';
 
-    doc.moveDown();
+    const logoPath = path.join(__dirname, '../frontend/assets/logo.png');
 
-    doc
-      .fontSize(12)
-      .text(`Pedido: #${pedido.id}`)
-      .text(`Fecha: ${new Date(pedido.fecha).toLocaleString('es-MX')}`)
-      .text(`Cliente: ${pedido.nombre_cliente}`)
-      .text(`Teléfono: ${pedido.telefono}`)
-      .text(`Dirección: ${pedido.direccion}`)
-      .text(`Estado: ${pedido.estado}`);
+    const ticketUrl =
+      `https://backend-strike-motards.onrender.com/pedidos/${pedido.id}/ticket`;
 
-    doc.moveDown();
-
-    doc
-      .fontSize(14)
-      .text('Productos:', { underline: true });
-
-    doc.moveDown(0.5);
-
-    pedido.detalles.forEach((detalle, index) => {
-      doc
-        .fontSize(11)
-        .text(`${index + 1}. ${detalle.nombre_producto}`)
-        .text(`Cantidad: ${detalle.cantidad}`)
-        .text(`Precio unitario: $${Number(detalle.precio_unitario).toLocaleString('es-MX')} MXN`)
-        .text(`Subtotal: $${Number(detalle.subtotal).toLocaleString('es-MX')} MXN`);
-
-      doc.moveDown(0.7);
+    const qrDataUrl = await QRCode.toDataURL(ticketUrl, {
+      margin: 1,
+      width: 220,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      }
     });
 
-    doc.moveDown();
+    const qrBase64 =
+      qrDataUrl.replace(/^data:image\/png;base64,/, '');
+
+    const qrBuffer =
+      Buffer.from(qrBase64, 'base64');
+
+    function money(valor) {
+      return `$${Number(valor || 0).toLocaleString('es-MX')} MXN`;
+    }
+
+    function drawBox(x, y, w, h, color = negro2, stroke = rojoOscuro) {
+      doc
+        .save()
+        .roundedRect(x, y, w, h, 12)
+        .fillAndStroke(color, stroke)
+        .restore();
+    }
+
+    function drawLabelValue(label, value, x, y, w) {
+      doc
+        .fillColor(rojo)
+        .font('Helvetica-Bold')
+        .fontSize(9)
+        .text(label.toUpperCase(), x, y, {
+          width: w
+        });
+
+      doc
+        .fillColor(blanco)
+        .font('Helvetica')
+        .fontSize(11)
+        .text(String(value), x, y + 15, {
+          width: w
+        });
+    }
+
+    // Fondo principal
+    doc
+      .rect(0, 0, pageWidth, pageHeight)
+      .fill(negro);
+
+    // Fondo decorativo
+    doc
+      .save()
+      .circle(pageWidth - 60, 120, 160)
+      .fillOpacity(0.12)
+      .fill(rojo)
+      .restore();
 
     doc
-      .fontSize(16)
-      .text(`TOTAL: $${Number(pedido.total).toLocaleString('es-MX')} MXN`, {
-        align: 'right'
+      .save()
+      .circle(50, pageHeight - 70, 180)
+      .fillOpacity(0.08)
+      .fill(rojo)
+      .restore();
+
+    // Marco exterior
+    doc
+      .lineWidth(2)
+      .strokeColor(rojo)
+      .roundedRect(28, 28, pageWidth - 56, pageHeight - 56, 18)
+      .stroke();
+
+    // Encabezado
+    doc
+      .rect(28, 28, pageWidth - 56, 135)
+      .fill('#080D10');
+
+    doc
+      .moveTo(28, 163)
+      .lineTo(pageWidth - 28, 163)
+      .lineWidth(1)
+      .strokeColor(rojoOscuro)
+      .stroke();
+
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 52, 48, {
+        width: 92,
+        height: 92,
+        fit: [92, 92]
+      });
+    }
+
+    doc
+      .fillColor(blanco)
+      .font('Helvetica-Bold')
+      .fontSize(34)
+      .text('STRIKE', 155, 52, {
+        width: 250
       });
 
-    doc.moveDown();
+    doc
+      .fillColor(rojo)
+      .fontSize(30)
+      .text('MOTARDS', 155, 88, {
+        width: 280
+      });
 
     doc
+      .fillColor(gris)
+      .font('Helvetica-Bold')
+      .fontSize(9)
+      .characterSpacing(2)
+      .text('PREMIUM GEAR FOR REAL RIDERS', 157, 123, {
+        width: 300
+      });
+
+    doc.characterSpacing(0);
+
+    // Folio derecho
+    drawBox(pageWidth - 185, 48, 130, 78, '#0C1114', rojo);
+
+    doc
+      .fillColor(blanco)
+      .font('Helvetica-Bold')
       .fontSize(10)
-      .text('Gracias por comprar en Strike Motards.', {
+      .text('TICKET DE PEDIDO', pageWidth - 170, 62, {
+        width: 105,
+        align: 'center'
+      });
+
+    doc
+      .fillColor(rojo)
+      .fontSize(28)
+      .text(`#${pedido.id}`, pageWidth - 170, 82, {
+        width: 105,
+        align: 'center'
+      });
+
+    // Datos
+    const fechaPedido =
+      new Date(pedido.fecha).toLocaleString('es-MX');
+
+    drawBox(52, 185, pageWidth - 104, 112, '#0B1518', '#1F2A2E');
+
+    drawLabelValue('Fecha', fechaPedido, 72, 205, 140);
+    drawLabelValue('Cliente', pedido.nombre_cliente, 222, 205, 140);
+    drawLabelValue('Teléfono', pedido.telefono, 372, 205, 120);
+    drawLabelValue('Estado', pedido.estado, 492, 205, 80);
+
+    doc
+      .moveTo(72, 250)
+      .lineTo(pageWidth - 72, 250)
+      .lineWidth(0.7)
+      .strokeColor('#27363B')
+      .stroke();
+
+    drawLabelValue('Dirección de envío', pedido.direccion, 72, 263, pageWidth - 144);
+
+    // Título productos
+    doc
+      .save()
+      .polygon([52, 330], [185, 330], [165, 365], [52, 365])
+      .fill(rojoOscuro)
+      .restore();
+
+    doc
+      .fillColor(blanco)
+      .font('Helvetica-Bold')
+      .fontSize(14)
+      .text('PRODUCTOS', 72, 340);
+
+    // Tabla
+    const tableX = 52;
+    let tableY = 380;
+    const tableW = pageWidth - 104;
+
+    doc
+      .roundedRect(tableX, tableY, tableW, 38, 8)
+      .fill('#10181B');
+
+    doc
+      .fillColor(gris)
+      .font('Helvetica-Bold')
+      .fontSize(8)
+      .text('PRODUCTO', tableX + 18, tableY + 14, { width: 230 })
+      .text('CANT.', tableX + 270, tableY + 14, { width: 55, align: 'center' })
+      .text('PRECIO', tableX + 340, tableY + 14, { width: 90, align: 'center' })
+      .text('SUBTOTAL', tableX + 445, tableY + 14, { width: 85, align: 'right' });
+
+    tableY += 38;
+
+    pedido.detalles.forEach((detalle, index) => {
+      const rowHeight = 54;
+
+      doc
+        .rect(tableX, tableY, tableW, rowHeight)
+        .fill(index % 2 === 0 ? '#071013' : '#0B1518');
+
+      doc
+        .moveTo(tableX, tableY)
+        .lineTo(tableX + tableW, tableY)
+        .strokeColor('#1F2A2E')
+        .lineWidth(0.5)
+        .stroke();
+
+      doc
+        .fillColor(blanco)
+        .font('Helvetica-Bold')
+        .fontSize(10)
+        .text(`${index + 1}. ${detalle.nombre_producto}`, tableX + 18, tableY + 17, {
+          width: 230
+        });
+
+      doc
+        .fillColor(blanco)
+        .font('Helvetica')
+        .fontSize(11)
+        .text(String(detalle.cantidad), tableX + 270, tableY + 17, {
+          width: 55,
+          align: 'center'
+        });
+
+      doc
+        .fillColor(blanco)
+        .fontSize(10)
+        .text(money(detalle.precio_unitario), tableX + 340, tableY + 17, {
+          width: 90,
+          align: 'center'
+        });
+
+      doc
+        .fillColor(rojo)
+        .font('Helvetica-Bold')
+        .fontSize(10)
+        .text(money(detalle.subtotal), tableX + 445, tableY + 17, {
+          width: 85,
+          align: 'right'
+        });
+
+      tableY += rowHeight;
+    });
+
+    // Total
+    const totalY = Math.max(tableY + 22, 555);
+
+    doc
+      .save()
+      .polygon([
+        pageWidth - 300, totalY,
+        pageWidth - 52, totalY,
+        pageWidth - 52, totalY + 70,
+        pageWidth - 330, totalY + 70
+      ])
+      .fillAndStroke('#0C1114', rojo)
+      .restore();
+
+    doc
+      .fillColor(gris)
+      .font('Helvetica-Bold')
+      .fontSize(13)
+      .text('TOTAL A PAGAR', pageWidth - 285, totalY + 14, {
+        width: 210,
+        align: 'center'
+      });
+
+    doc
+      .fillColor(rojo)
+      .fontSize(24)
+      .text(money(pedido.total), pageWidth - 300, totalY + 35, {
+        width: 230,
+        align: 'center'
+      });
+
+    // QR
+    const qrY = totalY + 95;
+
+    drawBox(52, qrY, 250, 115, '#0B1518', rojoOscuro);
+
+    doc.image(qrBuffer, 68, qrY + 18, {
+      width: 78,
+      height: 78
+    });
+
+    doc
+      .fillColor(blanco)
+      .font('Helvetica-Bold')
+      .fontSize(11)
+      .text('ESCANEA PARA VER TU PEDIDO', 158, qrY + 24, {
+        width: 125
+      });
+
+    doc
+      .fillColor(gris)
+      .font('Helvetica')
+      .fontSize(8)
+      .text('El código QR abre el ticket PDF en línea para consultar el pedido.', 158, qrY + 55, {
+        width: 125,
+        lineGap: 2
+      });
+
+    doc
+      .fillColor(rojo)
+      .font('Helvetica-Bold')
+      .fontSize(7)
+      .text(`Pedido #${pedido.id}`, 158, qrY + 92, {
+        width: 125
+      });
+
+    // Gracias
+    drawBox(322, qrY, pageWidth - 374, 115, '#0B1518', rojoOscuro);
+
+    doc
+      .fillColor(blanco)
+      .font('Helvetica-Bold')
+      .fontSize(18)
+      .text('¡GRACIAS POR TU COMPRA!', 342, qrY + 26, {
+        width: pageWidth - 414,
+        align: 'center'
+      });
+
+    doc
+      .fillColor(gris)
+      .font('Helvetica')
+      .fontSize(10)
+      .text('Gracias por confiar en Strike Motards. Nos vemos en la carretera.', 352, qrY + 62, {
+        width: pageWidth - 434,
+        align: 'center',
+        lineGap: 3
+      });
+
+    // Footer
+    doc
+      .rect(28, pageHeight - 86, pageWidth - 56, 58)
+      .fill('#080D10');
+
+    doc
+      .fillColor(blanco)
+      .font('Helvetica-Bold')
+      .fontSize(9)
+      .text('CALIDAD GARANTIZADA', 72, pageHeight - 65)
+      .text('ENVÍO GRATIS', 245, pageHeight - 65)
+      .text('PAGO SEGURO', 395, pageHeight - 65);
+
+    doc
+      .fillColor(gris)
+      .font('Helvetica')
+      .fontSize(8)
+      .text('Contacto: info@strikemotards.com  |  WhatsApp: 7292529554', 52, pageHeight - 42, {
+        width: pageWidth - 104,
         align: 'center'
       });
 
