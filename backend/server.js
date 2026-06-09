@@ -557,13 +557,13 @@ app.get('/pedidos/:id/ticket', async (req, res) => {
       .fill('#10181B');
 
     doc
-      .fillColor(gris)
-      .font('Helvetica-Bold')
-      .fontSize(8)
-      .text('PRODUCTO', tableX + 18, tableY + 14, { width: 230 })
-      .text('CANT.', tableX + 270, tableY + 14, { width: 55, align: 'center' })
-      .text('PRECIO', tableX + 340, tableY + 14, { width: 90, align: 'center' })
-      .text('SUBTOTAL', tableX + 445, tableY + 14, { width: 85, align: 'right' });
+  .fillColor(gris)
+  .font('Helvetica-Bold')
+  .fontSize(8)
+  .text('PRODUCTO', tableX + 18, tableY + 14, { width: 250 })
+  .text('CANT.', tableX + 285, tableY + 14, { width: 45, align: 'center' })
+  .text('PRECIO', tableX + 345, tableY + 14, { width: 90, align: 'center' })
+  .text('SUBTOTAL', tableX + 420, tableY + 14, { width: 85, align: 'right' });
 
     tableY += 38;
 
@@ -582,44 +582,77 @@ app.get('/pedidos/:id/ticket', async (req, res) => {
         .stroke();
 
       doc
-        .fillColor(blanco)
-        .font('Helvetica-Bold')
-        .fontSize(10)
-        .text(`${index + 1}. ${detalle.nombre_producto}`, tableX + 18, tableY + 17, {
-          width: 230
-        });
+  .fillColor(blanco)
+  .font('Helvetica-Bold')
+  .fontSize(10)
+  .text(`${index + 1}. ${detalle.nombre_producto}`, tableX + 18, tableY + 17, {
+    width: 250
+  });
 
-      doc
-        .fillColor(blanco)
-        .font('Helvetica')
-        .fontSize(11)
-        .text(String(detalle.cantidad), tableX + 270, tableY + 17, {
-          width: 55,
-          align: 'center'
-        });
+doc
+  .fillColor(blanco)
+  .font('Helvetica')
+  .fontSize(11)
+  .text(String(detalle.cantidad), tableX + 285, tableY + 17, {
+    width: 45,
+    align: 'center'
+  });
 
-      doc
-        .fillColor(blanco)
-        .fontSize(10)
-        .text(money(detalle.precio_unitario), tableX + 340, tableY + 17, {
-          width: 90,
-          align: 'center'
-        });
+doc
+  .fillColor(blanco)
+  .fontSize(10)
+  .text(money(detalle.precio_unitario), tableX + 345, tableY + 17, {
+    width: 90,
+    align: 'center'
+  });
 
-      doc
-        .fillColor(rojo)
-        .font('Helvetica-Bold')
-        .fontSize(10)
-        .text(money(detalle.subtotal), tableX + 445, tableY + 17, {
-          width: 85,
-          align: 'right'
-        });
-
+doc
+  .fillColor(rojo)
+  .font('Helvetica-Bold')
+  .fontSize(10)
+  .text(money(detalle.subtotal), tableX + 420, tableY + 17, {
+  width: 85,
+  align: 'right'
+  });
       tableY += rowHeight;
     });
+// Si la tabla creció mucho, mandamos el cierre del ticket a otra página
+if (tableY > 540) {
+  doc.addPage({
+    size: 'A4',
+    margin: 0
+  });
 
+  doc
+    .rect(0, 0, pageWidth, pageHeight)
+    .fill(negro);
+
+  doc
+    .lineWidth(2)
+    .strokeColor(rojo)
+    .roundedRect(28, 28, pageWidth - 56, pageHeight - 56, 18)
+    .stroke();
+
+  tableY = 120;
+
+  doc
+    .fillColor(blanco)
+    .font('Helvetica-Bold')
+    .fontSize(28)
+    .text('STRIKE', 52, 55);
+
+  doc
+    .fillColor(rojo)
+    .fontSize(26)
+    .text('MOTARDS', 52, 86);
+
+  doc
+    .fillColor(gris)
+    .fontSize(10)
+    .text(`Continuación del pedido #${pedido.id}`, 52, 120);
+}
     // Total
-    const totalY = Math.max(tableY + 22, 555);
+   const totalY = tableY + 35;
 
     doc
       .save()
@@ -650,7 +683,7 @@ app.get('/pedidos/:id/ticket', async (req, res) => {
       });
 
     // QR
-    const qrY = totalY + 95;
+   const qrY = totalY + 105;
 
     drawBox(52, qrY, 250, 115, '#0B1518', rojoOscuro);
 
