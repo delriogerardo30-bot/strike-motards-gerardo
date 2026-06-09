@@ -485,15 +485,14 @@ app.get('/pedidos/:id/ticket', async (req, res) => {
       });
 
     doc
-      .fillColor(gris)
-      .font('Helvetica-Bold')
-      .fontSize(9)
-      .characterSpacing(2)
-      .text('PREMIUM GEAR FOR REAL RIDERS', 157, 123, {
-        width: 300
-      });
+  .fillColor(gris)
+  .font('Helvetica-Bold')
+  .fontSize(9)
+  .text('PREMIUM GEAR FOR REAL RIDERS', 157, 123, {
+    width: 300
+  });
 
-    doc.characterSpacing(0);
+    
 
     // Folio derecho
     drawBox(pageWidth - 185, 48, 130, 78, '#0C1114', rojo);
