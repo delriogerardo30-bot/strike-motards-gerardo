@@ -212,22 +212,23 @@
                 opacity: 1;
                 transform: translateY(0);
             }
-        }        /* ================= HERO ================= */
+        }        
+        /* ================= HERO ================= */
 
         #inicio {
-            min-height: 88vh;
-            background:
-                linear-gradient(90deg, rgba(2,6,8,0.96), rgba(7,20,26,0.76), rgba(2,6,8,0.96)),
-                url('https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=2070') center/cover;
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
-            text-align: left;
-            padding: 0 7%;
-            position: relative;
-            overflow: hidden;
-        }
+    min-height: 88vh;
+    background:
+        linear-gradient(90deg, rgba(2,6,8,0.96), rgba(7,20,26,0.76), rgba(2,6,8,0.96)),
+        url('https://images.unsplash.com/photo-1558981403-c5f91cbba527?q=80&w=2070') center/cover;
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 90px 7%;
+    position: relative;
+    overflow: hidden;
+}
 
         #inicio.active {
             display: flex;
@@ -271,31 +272,34 @@
         }
 
         .hero-tag {
-            z-index: 1;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 9px 16px;
-            margin-bottom: 22px;
-            border: 1px solid rgba(0,212,200,0.28);
-            background: rgba(0,212,200,0.10);
-            border-radius: 999px;
-            color: var(--teal);
-            font-weight: 900;
-            font-size: 0.86rem;
-            box-shadow: 0 0 25px rgba(0,212,200,0.12);
-        }
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 9px 16px;
+    margin: 0 auto 22px;
+    border: 1px solid rgba(0,212,200,0.28);
+    background: rgba(0,212,200,0.10);
+    border-radius: 999px;
+    color: var(--teal);
+    font-weight: 900;
+    font-size: 0.86rem;
+    box-shadow: 0 0 25px rgba(0,212,200,0.12);
+}
 
-        #inicio h1 {
-            font-size: clamp(3rem,7vw,6.5rem);
-            line-height: 0.95;
-            font-weight: 900;
-            max-width: 850px;
-            z-index: 1;
-            letter-spacing: -2px;
-            text-shadow: 0 12px 35px rgba(0,0,0,0.55);
-            animation: heroText 0.8s ease both;
-        }
+       #inicio h1 {
+    font-size: clamp(3rem,7vw,6.5rem);
+    line-height: 0.95;
+    font-weight: 900;
+    max-width: 1050px;
+    width: 100%;
+    z-index: 1;
+    letter-spacing: -2px;
+    text-align: center;
+    text-shadow: 0 12px 35px rgba(0,0,0,0.55);
+    animation: heroText 0.8s ease both;
+}
 
         #inicio h1 span {
     color: transparent;
