@@ -653,7 +653,7 @@ function showCheckout() {
                     onclick="confirmOrder()"
                     class="btn-whatsapp"
                 >
-                    Enviar por WhatsApp
+                    Confirmar pedido
                 </button>
 
             </div>
@@ -759,10 +759,16 @@ async function confirmOrder() {
 
     if (!valido) return;
 
-    const whatsappWindow =
-        window.open("", "_blank");
-
     try {
+
+        const productosPedido =
+            cart.map(item => ({
+                id: item.id,
+                nombre: item.nombre,
+                precio: Number(item.precio || 0),
+                cantidad: item.quantity || 1,
+                subtotal: Number(item.precio || 0) * (item.quantity || 1)
+            }));
 
         const respuesta =
             await fetch(`${API_URL}/pedidos`, {
@@ -785,84 +791,26 @@ async function confirmOrder() {
             await respuesta.json();
 
         if (!respuesta.ok) {
-
-            if (whatsappWindow) {
-                whatsappWindow.close();
-            }
-
             alert(resultado.error || "No se pudo registrar el pedido");
             return;
         }
 
-        let mensaje = "";
-
-        mensaje += "COMANDA DE PEDIDO - STRIKE MOTARDS\n";
-        mensaje += "----------------------------------\n\n";
-
-        mensaje += `Pedido: #${resultado.pedido_id}\n`;
-        mensaje += `Cliente: ${nombre}\n`;
-        mensaje += `Telefono: ${telefono}\n`;
-        mensaje += `Direccion: ${direccion}\n\n`;
-
-        mensaje += "PRODUCTOS:\n";
-
-        let total = 0;
-
-        cart.forEach((p, index) => {
-
-            const qty =
-                p.quantity || 1;
-
-            const precio =
-                Number(p.precio || 0);
-
-            const subtotal =
-                precio * qty;
-
-            mensaje += `\n${index + 1}. ${p.nombre}\n`;
-            mensaje += `Cantidad: ${qty}\n`;
-            mensaje += `Precio unitario: $${precio.toLocaleString("es-MX")} MXN\n`;
-            mensaje += `Subtotal: $${subtotal.toLocaleString("es-MX")} MXN\n`;
-
-            total += subtotal;
-        });
-
-        mensaje += "\n----------------------------------\n";
-        mensaje += `TOTAL: $${total.toLocaleString("es-MX")} MXN\n`;
-        mensaje += "----------------------------------\n";
-        mensaje += "\nEstado: Pendiente de confirmacion";
-
-        const ticketUrl =
-            `${API_URL}/pedidos/${resultado.pedido_id}/ticket`;
-
-        const link =
-            document.createElement("a");
-
-        link.href = ticketUrl;
-        link.download =
-            `ticket-strike-motards-${resultado.pedido_id}.pdf`;
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        const ticketLinkPublico =
-            `https://backend-strike-motards.onrender.com/pedidos/${resultado.pedido_id}/ticket`;
-
-        mensaje += "\n\nTICKET PDF:";
-        mensaje += `\n${ticketLinkPublico}`;
-        mensaje += "\n\n PDF descargado automaticamente y enlace de este mismo adjunto, puedes abrirlo desde el enlace anterior.";
-
-        const whatsappUrl =
-            `https://wa.me/527292529554?text=${encodeURIComponent(mensaje)}`;
-
-        if (whatsappWindow) {
-            whatsappWindow.location.href = whatsappUrl;
-        } else {
-            window.location.href = whatsappUrl;
-        }
+        const total =
+            productosPedido.reduce((sum, item) => {
+                return sum + item.subtotal;
+            }, 0);
 
         closeCheckout();
+
+        const pedidoGenerado = {
+            id: resultado.pedido_id,
+            nombre,
+            telefono,
+            direccion,
+            productos: productosPedido,
+            total,
+            fecha: new Date().toLocaleString("es-MX")
+        };
 
         cart = [];
 
@@ -877,21 +825,180 @@ async function confirmOrder() {
         }
 
         productsLoaded = false;
-
         await cargarProductos();
 
-        showToast("Pedido registrado, PDF generado y WhatsApp abierto");
+        mostrarTicketPedido(pedidoGenerado);
+
+        showToast("Pedido registrado correctamente");
 
     } catch (error) {
-
-        if (whatsappWindow) {
-            whatsappWindow.close();
-        }
 
         console.error("Error al registrar pedido:", error);
 
         alert("Ocurrió un error al registrar el pedido. Intenta de nuevo.");
     }
+}
+/* ====================
+   TICKET VISUAL
+==================== */
+
+function mostrarTicketPedido(pedido) {
+
+    const ticketExistente =
+        document.getElementById("ticket-modal");
+
+    if (ticketExistente) {
+        ticketExistente.remove();
+    }
+
+    const productosHTML =
+        pedido.productos.map((item, index) => {
+            return `
+                <div class="ticket-product-row">
+
+                    <div>
+                        <strong>${index + 1}. ${escapeHTML(item.nombre)}</strong>
+                        <small>
+                            Cantidad: ${item.cantidad} × $${item.precio.toLocaleString("es-MX")} MXN
+                        </small>
+                    </div>
+
+                    <span>
+                        $${item.subtotal.toLocaleString("es-MX")} MXN
+                    </span>
+
+                </div>
+            `;
+        }).join("");
+
+    const ticketHTML = `
+        <div id="ticket-modal">
+
+            <div class="ticket-card">
+
+                <button class="ticket-close" onclick="cerrarTicketPedido()">
+                    ×
+                </button>
+
+                <div class="ticket-header">
+
+                    <div class="ticket-logo-box">
+                        <img src="assets/logo.png" alt="Strike Motards">
+                    </div>
+
+                    <h2>STRIKE MOTARDS</h2>
+                    <p>Ticket de compra</p>
+
+                </div>
+
+                <div class="ticket-info-grid">
+
+                    <div>
+                        <span>Folio</span>
+                        <strong>#${pedido.id}</strong>
+                    </div>
+
+                    <div>
+                        <span>Fecha</span>
+                        <strong>${pedido.fecha}</strong>
+                    </div>
+
+                    <div>
+                        <span>Cliente</span>
+                        <strong>${escapeHTML(pedido.nombre)}</strong>
+                    </div>
+
+                    <div>
+                        <span>Teléfono</span>
+                        <strong>${escapeHTML(pedido.telefono)}</strong>
+                    </div>
+
+                </div>
+
+                <div class="ticket-address">
+                    <span>Dirección de envío</span>
+                    <p>${escapeHTML(pedido.direccion)}</p>
+                </div>
+
+                <div class="ticket-products">
+
+                    <h3>Productos</h3>
+
+                    ${productosHTML}
+
+                </div>
+
+                <div class="ticket-total">
+                    <span>Total</span>
+                    <strong>$${pedido.total.toLocaleString("es-MX")} MXN</strong>
+                </div>
+
+                <div class="ticket-actions">
+
+                    <button onclick="descargarTicketPDF(${pedido.id})">
+                        Descargar ticket PDF
+                    </button>
+
+                    <button onclick="contactarVendedorWhatsApp(${pedido.id})">
+                        Contactar vendedor por WhatsApp
+                    </button>
+
+                </div>
+
+                <p class="ticket-footer-text">
+                    Gracias por comprar en Strike Motards. Tu pedido quedó registrado correctamente.
+                </p>
+
+            </div>
+
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML("beforeend", ticketHTML);
+}
+
+function cerrarTicketPedido() {
+
+    const modal =
+        document.getElementById("ticket-modal");
+
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function descargarTicketPDF(pedidoId) {
+
+    const ticketUrl =
+        `${API_URL}/pedidos/${pedidoId}/ticket`;
+
+    const link =
+        document.createElement("a");
+
+    link.href = ticketUrl;
+    link.download =
+        `ticket-strike-motards-${pedidoId}.pdf`;
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function contactarVendedorWhatsApp(pedidoId) {
+
+    const ticketLink =
+        `${API_URL}/pedidos/${pedidoId}/ticket`;
+
+    const mensaje =
+        `Hola, acabo de realizar un pedido en Strike Motards.\n\n` +
+        `Pedido: #${pedidoId}\n` +
+        `Ticket PDF: ${ticketLink}\n\n` +
+        `Quisiera confirmar mi compra con un vendedor.`;
+
+    const whatsappUrl =
+        `https://wa.me/527292529554?text=${encodeURIComponent(mensaje)}`;
+
+    window.open(whatsappUrl, "_blank");
 }
 
 // ==================== TOAST ====================
