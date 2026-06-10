@@ -8,11 +8,22 @@ const QRCode = require('qrcode');
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
+const cloudinary = require('cloudinary').v2;
+const multer = require('multer');
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
+
+const upload = multer({
+  storage: multer.memoryStorage()
+});
 
 /* =========================
    CONEXIÓN A POSTGRES
@@ -1063,6 +1074,48 @@ app.post('/usuarios/login', async (req, res) => {
 ========================= */
 app.get('/', (req, res) => {
   res.send('API de Strike Motards funcionando 🚀');
+});
+// ====================================
+// SUBIR IMÁGENES A CLOUDINARY
+// ====================================
+
+app.post('/admin/upload-imagen', upload.single('imagen'), async (req, res) => {
+  try {
+
+    if (!req.file) {
+      return res.status(400).json({
+        error: 'No se recibió ninguna imagen'
+      });
+    }
+
+    const resultado = await new Promise((resolve, reject) => {
+
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: 'strike-motards'
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+
+      stream.end(req.file.buffer);
+    });
+
+    res.json({
+      url: resultado.secure_url
+    });
+
+  } catch (error) {
+
+    console.error(error);
+
+    res.status(500).json({
+      error: 'Error al subir imagen'
+    });
+
+  }
 });
 
 /* =========================

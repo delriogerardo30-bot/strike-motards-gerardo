@@ -640,11 +640,30 @@ RESPONSIVE
                         >
 
                         <input
-                            type="text"
-                            id="imagenProducto"
-                            placeholder="Ruta o URL de imagen"
-                            maxlength="180"
-                        >
+    type="hidden"
+    id="imagenProducto"
+>
+
+<input
+    type="file"
+    id="archivoImagenProducto"
+    accept="image/*"
+    onchange="previsualizarImagenProducto()"
+>
+
+<img
+    id="previewImagenProducto"
+    src=""
+    alt="Vista previa"
+    style="display:none; width:180px; height:180px; object-fit:cover; border-radius:14px; border:1px solid #00d9ff;"
+>
+
+<button
+    type="button"
+    onclick="subirImagenProducto()"
+>
+    Subir imagen
+</button>
 
                         <select id="categoriaProducto">
 
@@ -1123,7 +1142,56 @@ async function cambiarEstadoPedido(id, estado){
         alert('Error al cambiar estado');
     }
 }
+function previsualizarImagenProducto(){
 
+    const archivo = document.getElementById('archivoImagenProducto').files[0];
+    const preview = document.getElementById('previewImagenProducto');
+
+    if(!archivo){
+        preview.style.display = 'none';
+        preview.src = '';
+        return;
+    }
+
+    preview.src = URL.createObjectURL(archivo);
+    preview.style.display = 'block';
+}
+
+async function subirImagenProducto(){
+
+    const archivo = document.getElementById('archivoImagenProducto').files[0];
+
+    if(!archivo){
+        alert('Selecciona una imagen primero');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('imagen', archivo);
+
+    try{
+
+        const respuesta = await fetch(`${API_URL}/admin/upload-imagen`, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await respuesta.json();
+
+        if(!respuesta.ok){
+            alert(data.error || 'Error al subir imagen');
+            return;
+        }
+
+        document.getElementById('imagenProducto').value = data.url;
+
+        alert('Imagen subida correctamente');
+
+    }catch(error){
+        console.error('Error subiendo imagen:', error);
+        alert('Error al subir imagen');
+    }
+}
 /* =========================
 PRODUCTOS
 ========================= */
@@ -1138,6 +1206,11 @@ async function guardarProducto(){
         categoria: document.getElementById('categoriaProducto').value,
         stock: Number(document.getElementById('stockProducto').value)
     };
+    
+    if(!producto.imagen_url){
+    alert('Primero selecciona y sube una imagen');
+    return;
+}
 
     if(!producto.nombre || producto.nombre.length < 3){
         alert('El nombre debe tener al menos 3 caracteres');
