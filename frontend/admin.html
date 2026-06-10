@@ -385,7 +385,26 @@ table td{
     color:black;
     font-weight:bold;
     cursor:pointer;
-}/* =========================
+}
+.btn-ticket{
+    background:#18c3ff;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    margin-right:5px;
+}
+
+.btn-whatsapp{
+    background:#25D366;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+}
+/* =========================
 RESPONSIVE
 ========================= */
 
@@ -430,6 +449,7 @@ RESPONSIVE
     table{
         min-width:850px;
     }
+    
 
 }
 
@@ -846,6 +866,7 @@ RESPONSIVE
                                     <th>Dirección</th>
                                     <th>Total</th>
                                     <th>Estado</th>
+                                    <th>Acciones</th>
 
                                 </tr>
 
@@ -1088,27 +1109,43 @@ async function cargarPedidos(){
                     <td>$${Number(pedido.total).toLocaleString('es-MX')}</td>
 
                     <td>
-                        <select
-                            class="estado-select"
-                            onchange="cambiarEstadoPedido(${pedido.id}, this.value)"
-                        >
-                            <option value="Pendiente" ${pedido.estado === 'Pendiente' ? 'selected' : ''}>
-                                Pendiente
-                            </option>
+    <select
+        class="estado-select"
+        onchange="cambiarEstadoPedido(${pedido.id}, this.value)"
+    >
+        <option value="Pendiente" ${pedido.estado === 'Pendiente' ? 'selected' : ''}>
+            Pendiente
+        </option>
 
-                            <option value="Enviado" ${pedido.estado === 'Enviado' ? 'selected' : ''}>
-                                Enviado
-                            </option>
+        <option value="Enviado" ${pedido.estado === 'Enviado' ? 'selected' : ''}>
+            Enviado
+        </option>
 
-                            <option value="Entregado" ${pedido.estado === 'Entregado' ? 'selected' : ''}>
-                                Entregado
-                            </option>
+        <option value="Entregado" ${pedido.estado === 'Entregado' ? 'selected' : ''}>
+            Entregado
+        </option>
 
-                            <option value="Cancelado" ${pedido.estado === 'Cancelado' ? 'selected' : ''}>
-                                Cancelado
-                            </option>
-                        </select>
-                    </td>
+        <option value="Cancelado" ${pedido.estado === 'Cancelado' ? 'selected' : ''}>
+            Cancelado
+        </option>
+    </select>
+</td>
+
+<td>
+    <button
+        onclick="verTicket(${pedido.id})"
+        class="btn-ticket"
+    >
+        📄 Ticket
+    </button>
+
+    <button
+        onclick="contactarWhatsapp('${pedido.telefono}', ${pedido.id})"
+        class="btn-whatsapp"
+    >
+        💬 WhatsApp
+    </button>
+</td>
                 </tr>
             `;
         });
@@ -1116,6 +1153,27 @@ async function cargarPedidos(){
     }catch(error){
         console.error('Error cargando pedidos:', error);
     }
+}
+
+function verTicket(id){
+
+    window.open(
+        `${API_URL}/pedidos/${id}/ticket`,
+        '_blank'
+    );
+
+}
+
+function contactarWhatsapp(telefono, id){
+
+    const mensaje =
+        `Hola, te contactamos de Strike Motards respecto a tu pedido #${id}.`;
+
+    const url =
+        `https://wa.me/52${telefono}?text=${encodeURIComponent(mensaje)}`;
+
+    window.open(url, '_blank');
+
 }
 
 async function cambiarEstadoPedido(id, estado){
@@ -1142,6 +1200,7 @@ async function cambiarEstadoPedido(id, estado){
         alert('Error al cambiar estado');
     }
 }
+
 function previsualizarImagenProducto(){
 
     const archivo = document.getElementById('archivoImagenProducto').files[0];
@@ -1336,6 +1395,9 @@ function limpiarFormulario(){
     document.getElementById('descripcionProducto').value = '';
     document.getElementById('precioProducto').value = '';
     document.getElementById('imagenProducto').value = '';
+    document.getElementById('archivoImagenProducto').value = '';
+    document.getElementById('previewImagenProducto').src = '';
+    document.getElementById('previewImagenProducto').style.display = 'none';
     document.getElementById('categoriaProducto').value = '';
     document.getElementById('stockProducto').value = '';
 
