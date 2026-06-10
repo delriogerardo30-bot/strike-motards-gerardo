@@ -440,6 +440,14 @@ BOTONES
     overflow:visible;
     white-space:nowrap;
 }
+.miniatura-producto{
+    width:58px;
+    height:58px;
+    object-fit:cover;
+    border-radius:12px;
+    border:1px solid rgba(0,217,255,.35);
+    background:#02111f;
+}
 
 /* =========================
 MODAL DETALLE PEDIDO
@@ -712,6 +720,7 @@ RESPONSIVE
                                 <tr>
                                     <th>ID</th>
                                     <th>Producto</th>
+                                    <th>Imagen</th>
                                     <th>Categoría</th>
                                     <th>Precio</th>
                                     <th>Stock</th>
@@ -905,40 +914,48 @@ function renderizarProductosAdmin(productos){
 
     tabla.innerHTML = '';
 
-    productos.forEach(producto => {
+productos.forEach(producto => {
 
-        tabla.innerHTML += `
-            <tr>
-                <td>#${producto.id}</td>
+    tabla.innerHTML += `
+        <tr>
+            <td>#${producto.id}</td>
 
-                <td class="nombre-col" title="${producto.nombre}">
-                    ${producto.nombre}
-                </td>
+            <td>
+                <img
+                    src="${producto.imagen_url}"
+                    alt="${producto.nombre}"
+                    class="miniatura-producto"
+                >
+            </td>
 
-                <td>${producto.categoria}</td>
+            <td class="nombre-col" title="${producto.nombre}">
+                ${producto.nombre}
+            </td>
 
-                <td>$${Number(producto.precio).toLocaleString('es-MX')}</td>
+            <td>${producto.categoria}</td>
 
-                <td>${producto.stock}</td>
+            <td>$${Number(producto.precio).toLocaleString('es-MX')}</td>
 
-                <td>
-                    <button
-                        class="btn-editar"
-                        onclick='editarProducto(${JSON.stringify(producto)})'
-                    >
-                        Editar
-                    </button>
+            <td>${producto.stock}</td>
 
-                    <button
-                        class="btn-eliminar"
-                        onclick="eliminarProducto(${producto.id})"
-                    >
-                        Eliminar
-                    </button>
-                </td>
-            </tr>
-        `;
-    });
+            <td>
+                <button
+                    class="btn-editar"
+                    onclick='editarProducto(${JSON.stringify(producto)})'
+                >
+                    Editar
+                </button>
+
+                <button
+                    class="btn-eliminar"
+                    onclick="eliminarProducto(${producto.id})"
+                >
+                    Eliminar
+                </button>
+            </td>
+        </tr>
+    `;
+});
 }
 
 function filtrarProductosAdmin(){
