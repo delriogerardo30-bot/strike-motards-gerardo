@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Panel Admin - Strike Motards</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 
@@ -626,6 +627,21 @@ RESPONSIVE
                         <p id="totalProductos">0</p>
                     </div>
                 </div>
+                <div class="section">
+    <h2>📈 Gráficas de ventas y pedidos</h2>
+
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>Pedidos por estado</h3>
+            <canvas id="graficaEstados"></canvas>
+        </div>
+
+        <div class="chart-card">
+            <h3>Ventas por pedido</h3>
+            <canvas id="graficaVentas"></canvas>
+        </div>
+    </div>
+</div>
             </section>
 
             <section id="gestionProductos" class="admin-section">
@@ -792,6 +808,8 @@ const API_URL =
 let productoEditando = null;
 let productosAdmin = [];
 let pedidosAdmin = [];
+let graficaEstados = null;
+let graficaVentas = null;
 
 /* =========================
 MENÚ LATERAL
@@ -1081,7 +1099,55 @@ function renderizarPedidosAdmin(pedidos){
         `;
     });
 }
+function renderizarGraficasDashboard(){
 
+    const canvasEstados = document.getElementById('graficaEstados');
+    const canvasVentas = document.getElementById('graficaVentas');
+
+    if(!canvasEstados || !canvasVentas){
+        return;
+    }
+
+    const pendientes = pedidosAdmin.filter(p => p.estado === 'Pendiente').length;
+    const enviados = pedidosAdmin.filter(p => p.estado === 'Enviado').length;
+    const entregados = pedidosAdmin.filter(p => p.estado === 'Entregado').length;
+    const cancelados = pedidosAdmin.filter(p => p.estado === 'Cancelado').length;
+
+    if(graficaEstados){
+        graficaEstados.destroy();
+    }
+
+    graficaEstados = new Chart(canvasEstados, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pendiente', 'Enviado', 'Entregado', 'Cancelado'],
+            datasets: [{
+                data: [pendientes, enviados, entregados, cancelados],
+                backgroundColor: ['#ffb800', '#18c3ff', '#25D366', '#ff3b3b']
+            }]
+        }
+    });
+
+    const pedidosOrdenados = [...pedidosAdmin]
+        .sort((a,b) => a.id - b.id)
+        .slice(-10);
+
+    if(graficaVentas){
+        graficaVentas.destroy();
+    }
+
+    graficaVentas = new Chart(canvasVentas, {
+        type: 'bar',
+        data: {
+            labels: pedidosOrdenados.map(p => `#${p.id}`),
+            datasets: [{
+                label: 'Total del pedido',
+                data: pedidosOrdenados.map(p => Number(p.total)),
+                backgroundColor: '#18c3ff'
+            }]
+        }
+    });
+}
 function filtrarPedidosAdmin(){
 
     const texto =
