@@ -416,6 +416,85 @@ table td{
     min-width:110px;
     margin:3px;
 }
+.btn-detalle{
+    background:#8b5cf6;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    display:inline-block;
+    min-width:110px;
+    margin:3px;
+    white-space:nowrap;
+}
+
+#detallePedidoModal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+    padding:20px;
+}
+
+.detalle-card{
+    width:100%;
+    max-width:720px;
+    max-height:90vh;
+    overflow-y:auto;
+    background:#08243d;
+    border:1px solid rgba(0,217,255,.2);
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 0 40px rgba(0,217,255,.18);
+}
+
+.detalle-card h2{
+    color:#00d9ff;
+    margin-bottom:15px;
+}
+
+.detalle-info{
+    background:#14395e;
+    padding:15px;
+    border-radius:14px;
+    margin-bottom:15px;
+    line-height:1.7;
+}
+
+.detalle-producto{
+    background:#02111f;
+    border:1px solid rgba(255,255,255,.08);
+    padding:14px;
+    border-radius:14px;
+    margin-bottom:10px;
+}
+
+.detalle-total{
+    margin-top:18px;
+    padding:15px;
+    background:#16d2f5;
+    color:#00111f;
+    border-radius:14px;
+    font-weight:bold;
+    font-size:20px;
+    text-align:right;
+}
+
+.btn-cerrar-detalle{
+    margin-top:18px;
+    width:100%;
+    padding:13px;
+    border:none;
+    border-radius:12px;
+    background:#ff3b3b;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
 /* =========================
 RESPONSIVE
 ========================= */
@@ -1143,20 +1222,27 @@ async function cargarPedidos(){
     </select>
 </td>
 
-<td>
+<td class="acciones-pedido">
     <button
-        onclick="verTicket(${pedido.id})"
-        class="btn-ticket"
-    >
-        📄 Ticket
-    </button>
+    onclick="verDetallePedido(${pedido.id})"
+    class="btn-detalle"
+>
+    👁 Detalle
+</button>
 
-    <button
-        onclick="contactarWhatsapp('${pedido.telefono}', ${pedido.id})"
-        class="btn-whatsapp"
-    >
-        💬 WhatsApp
-    </button>
+<button
+    onclick="verTicket(${pedido.id})"
+    class="btn-ticket"
+>
+    📄 Ticket
+</button>
+
+<button
+    onclick="contactarWhatsapp('${pedido.telefono}', ${pedido.id})"
+    class="btn-whatsapp"
+>
+    💬 WhatsApp
+</button>
 </td>
                 </tr>
             `;
@@ -1166,7 +1252,83 @@ async function cargarPedidos(){
         console.error('Error cargando pedidos:', error);
     }
 }
+async function verDetallePedido(id){
 
+    try{
+
+        const respuesta = await fetch(`${API_URL}/pedidos`);
+        const pedidos = await respuesta.json();
+
+        const pedido = pedidos.find(p => Number(p.id) === Number(id));
+
+        if(!pedido){
+            alert('No se encontró el pedido');
+            return;
+        }
+
+        const productosHTML = pedido.detalles.map(detalle => `
+            <div class="detalle-producto">
+                <strong>${detalle.nombre_producto}</strong><br>
+                Cantidad: ${detalle.cantidad}<br>
+                Precio unitario: $${Number(detalle.precio_unitario).toLocaleString('es-MX')}<br>
+                Subtotal: $${Number(detalle.subtotal).toLocaleString('es-MX')}
+            </div>
+        `).join('');
+
+        const modal = document.createElement('div');
+        modal.id = 'detallePedidoModal';
+
+        modal.innerHTML = `
+            <div class="detalle-card">
+
+                <h2>Detalle del pedido #${pedido.id}</h2>
+
+                <div class="detalle-info">
+                    <strong>Cliente:</strong> ${pedido.nombre_cliente}<br>
+                    <strong>Teléfono:</strong> ${pedido.telefono}<br>
+                    <strong>Dirección:</strong> ${pedido.direccion}<br>
+                    <strong>Estado:</strong> ${pedido.estado}<br>
+                    <strong>Fecha:</strong> ${new Date(pedido.fecha).toLocaleString('es-MX')}
+                </div>
+
+                <h3 style="color:#00d9ff; margin-bottom:12px;">
+                    Productos comprados
+                </h3>
+
+                ${productosHTML}
+
+                <div class="detalle-total">
+                    Total: $${Number(pedido.total).toLocaleString('es-MX')}
+                </div>
+
+                <button
+                    class="btn-cerrar-detalle"
+                    onclick="cerrarDetallePedido()"
+                >
+                    Cerrar
+                </button>
+
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+
+    }catch(error){
+
+        console.error('Error cargando detalle:', error);
+        alert('Error al cargar detalle del pedido');
+
+    }
+}
+
+function cerrarDetallePedido(){
+
+    const modal = document.getElementById('detallePedidoModal');
+
+    if(modal){
+        modal.remove();
+    }
+}
 function verTicket(id){
 
     window.open(
