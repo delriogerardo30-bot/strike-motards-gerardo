@@ -318,7 +318,7 @@ TABLAS
 table{
     width:100%;
     border-collapse:collapse;
-    table-layout:fixed;
+    table-layout:auto;
 }
 
 table th{
@@ -403,6 +403,18 @@ table td{
     padding:8px 12px;
     border-radius:8px;
     cursor:pointer;
+}
+#tablaPedidos td:last-child{
+    min-width:250px;
+    overflow:visible;
+    white-space:nowrap;
+}
+
+#tablaPedidos .btn-ticket,
+#tablaPedidos .btn-whatsapp{
+    display:inline-block;
+    min-width:110px;
+    margin:3px;
 }
 /* =========================
 RESPONSIVE
