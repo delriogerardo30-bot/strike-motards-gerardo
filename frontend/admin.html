@@ -159,7 +159,9 @@ LAYOUT ADMIN
     margin-left:270px;
     width:calc(100% - 270px);
     padding:30px;
-}/* =========================
+}
+
+/* =========================
 HEADER
 ========================= */
 
@@ -281,7 +283,9 @@ FORMULARIOS
 
 .form-admin button:hover{
     background:#00b7d6;
-}/* =========================
+}
+
+/* =========================
 FILTROS ADMIN
 ========================= */
 
@@ -331,15 +335,11 @@ table th{
 table td{
     padding:18px 15px;
     border-bottom:1px solid rgba(255,255,255,.08);
-
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
-
     max-width:220px;
 }
-
-/* DIRECCIONES MUY LARGAS */
 
 .direccion-col{
     max-width:250px;
@@ -348,14 +348,16 @@ table td{
     white-space:nowrap;
 }
 
-/* NOMBRES MUY LARGOS */
-
 .nombre-col{
     max-width:180px;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
 }
+
+/* =========================
+BOTONES
+========================= */
 
 .btn-editar{
     background:#16d2f5;
@@ -386,36 +388,7 @@ table td{
     font-weight:bold;
     cursor:pointer;
 }
-.btn-ticket{
-    background:#18c3ff;
-    color:white;
-    border:none;
-    padding:8px 12px;
-    border-radius:8px;
-    cursor:pointer;
-    margin-right:5px;
-}
 
-.btn-whatsapp{
-    background:#25D366;
-    color:white;
-    border:none;
-    padding:8px 12px;
-    border-radius:8px;
-    cursor:pointer;
-}
-#tablaPedidos td:last-child{
-    min-width:250px;
-    overflow:visible;
-    white-space:nowrap;
-}
-
-#tablaPedidos .btn-ticket,
-#tablaPedidos .btn-whatsapp{
-    display:inline-block;
-    min-width:110px;
-    margin:3px;
-}
 .btn-detalle{
     background:#8b5cf6;
     color:white;
@@ -428,6 +401,49 @@ table td{
     margin:3px;
     white-space:nowrap;
 }
+
+.btn-ticket{
+    background:#18c3ff;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    display:inline-block;
+    min-width:110px;
+    margin:3px;
+    white-space:nowrap;
+}
+
+.btn-whatsapp{
+    background:#25D366;
+    color:white;
+    border:none;
+    padding:8px 12px;
+    border-radius:8px;
+    cursor:pointer;
+    display:inline-block;
+    min-width:110px;
+    margin:3px;
+    white-space:nowrap;
+}
+
+.acciones-pedido{
+    min-width:380px;
+    overflow:visible;
+    white-space:nowrap;
+}
+
+#tablaPedidos td:last-child{
+    min-width:380px;
+    max-width:none;
+    overflow:visible;
+    white-space:nowrap;
+}
+
+/* =========================
+MODAL DETALLE PEDIDO
+========================= */
 
 #detallePedidoModal{
     position:fixed;
@@ -495,6 +511,7 @@ table td{
     font-weight:bold;
     cursor:pointer;
 }
+
 /* =========================
 RESPONSIVE
 ========================= */
@@ -538,316 +555,139 @@ RESPONSIVE
     }
 
     table{
-        min-width:850px;
+        min-width:950px;
     }
-    
 
 }
 
 </style>
-</head>
-
-<body>
-
-<!-- LOGIN -->
+</head><body>
 
 <div id="loginContainer">
-
     <div class="login-box">
-
         <h2>🔐 Login Administrador</h2>
 
-        <input
-            type="text"
-            id="usuario"
-            placeholder="Usuario"
-            maxlength="20"
-        >
+        <input type="text" id="usuario" placeholder="Usuario" maxlength="20">
+        <input type="password" id="password" placeholder="Contraseña" maxlength="30">
 
-        <input
-            type="password"
-            id="password"
-            placeholder="Contraseña"
-            maxlength="30"
-        >
-
-        <button onclick="loginAdmin()">
-            Ingresar
-        </button>
-
+        <button onclick="loginAdmin()">Ingresar</button>
     </div>
-
 </div>
 
-<!-- PANEL ADMIN -->
-
 <div id="adminPanel">
-
     <div class="admin-layout">
 
-        <!-- SIDEBAR -->
-
         <aside class="sidebar">
-
             <div class="sidebar-logo">
-
                 <h2>Strike<br>Motards</h2>
-
                 <span>Panel administrativo</span>
-
             </div>
 
             <div class="sidebar-menu">
-
-                <button
-                    class="menu-btn active"
-                    onclick="mostrarModulo('dashboard', this)"
-                >
-                    📊 Dashboard
-                </button>
-
-                <button
-                    class="menu-btn"
-                    onclick="mostrarModulo('gestionProductos', this)"
-                >
-                    📦 Gestión de productos
-                </button>
-
-                <button
-                    class="menu-btn"
-                    onclick="mostrarModulo('productosRegistrados', this)"
-                >
-                    📋 Productos registrados
-                </button>
-
-                <button
-                    class="menu-btn"
-                    onclick="mostrarModulo('pedidos', this)"
-                >
-                    🧾 Pedidos recientes
-                </button>
-
-                <button
-                    class="menu-btn logout-btn"
-                    onclick="cerrarSesionAdmin()"
-                >
-                    🚪 Cerrar sesión
-                </button>
-
+                <button class="menu-btn active" onclick="mostrarModulo('dashboard', this)">📊 Dashboard</button>
+                <button class="menu-btn" onclick="mostrarModulo('gestionProductos', this)">📦 Gestión de productos</button>
+                <button class="menu-btn" onclick="mostrarModulo('productosRegistrados', this)">📋 Productos registrados</button>
+                <button class="menu-btn" onclick="mostrarModulo('pedidos', this)">🧾 Pedidos recientes</button>
+                <button class="menu-btn logout-btn" onclick="cerrarSesionAdmin()">🚪 Cerrar sesión</button>
             </div>
-
         </aside>
 
-        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
 
-        <main class="main-content">            <!-- DASHBOARD -->
-
-            <section
-                id="dashboard"
-                class="admin-section active"
-            >
-
+            <section id="dashboard" class="admin-section active">
                 <div class="header-admin">
-
                     <div>
-
                         <h1>📊 Dashboard</h1>
-
-                        <p>
-                            Resumen general de ventas, pedidos y productos.
-                        </p>
-
+                        <p>Resumen general de ventas, pedidos y productos.</p>
                     </div>
-
                 </div>
 
                 <div class="cards">
-
                     <div class="card">
-
                         <h3>Total Pedidos</h3>
-
-                        <p id="totalPedidos">
-                            0
-                        </p>
-
+                        <p id="totalPedidos">0</p>
                     </div>
 
                     <div class="card">
-
                         <h3>Ventas Totales</h3>
-
-                        <p id="ventasTotales">
-                            $0
-                        </p>
-
+                        <p id="ventasTotales">$0</p>
                     </div>
 
                     <div class="card">
-
                         <h3>Productos</h3>
-
-                        <p id="totalProductos">
-                            0
-                        </p>
-
+                        <p id="totalProductos">0</p>
                     </div>
-
                 </div>
-
             </section>
 
-            <!-- GESTIÓN DE PRODUCTOS -->
-
-            <section
-                id="gestionProductos"
-                class="admin-section"
-            >
-
+            <section id="gestionProductos" class="admin-section">
                 <div class="header-admin">
-
                     <div>
-
                         <h1>📦 Gestión de productos</h1>
-
-                        <p>
-                            Agrega o actualiza productos del catálogo.
-                        </p>
-
+                        <p>Agrega o actualiza productos del catálogo.</p>
                     </div>
-
                 </div>
 
                 <div class="section">
-
                     <h2>Formulario de producto</h2>
 
                     <div class="form-admin">
+                        <input type="hidden" id="productoId">
+
+                        <input type="text" id="nombreProducto" placeholder="Nombre del producto" maxlength="60">
+
+                        <textarea id="descripcionProducto" placeholder="Descripción del producto" maxlength="180"></textarea>
+
+                        <input type="number" id="precioProducto" placeholder="Precio" min="1" max="999999">
+
+                        <input type="hidden" id="imagenProducto">
 
                         <input
-                            type="hidden"
-                            id="productoId"
+                            type="file"
+                            id="archivoImagenProducto"
+                            accept="image/*"
+                            onchange="previsualizarImagenProducto()"
                         >
 
-                        <input
-                            type="text"
-                            id="nombreProducto"
-                            placeholder="Nombre del producto"
-                            maxlength="60"
+                        <img
+                            id="previewImagenProducto"
+                            src=""
+                            alt="Vista previa"
+                            style="display:none; width:180px; height:180px; object-fit:cover; border-radius:14px; border:1px solid #00d9ff;"
                         >
 
-                        <textarea
-                            id="descripcionProducto"
-                            placeholder="Descripción del producto"
-                            maxlength="180"
-                        ></textarea>
-
-                        <input
-                            type="number"
-                            id="precioProducto"
-                            placeholder="Precio"
-                            min="1"
-                            max="999999"
-                        >
-
-                        <input
-    type="hidden"
-    id="imagenProducto"
->
-
-<input
-    type="file"
-    id="archivoImagenProducto"
-    accept="image/*"
-    onchange="previsualizarImagenProducto()"
->
-
-<img
-    id="previewImagenProducto"
-    src=""
-    alt="Vista previa"
-    style="display:none; width:180px; height:180px; object-fit:cover; border-radius:14px; border:1px solid #00d9ff;"
->
-
-<button
-    type="button"
-    onclick="subirImagenProducto()"
->
-    Subir imagen
-</button>
-
-                        <select id="categoriaProducto">
-
-                            <option value="">
-                                Selecciona categoría
-                            </option>
-
-                            <option value="Cascos">
-                                Cascos
-                            </option>
-
-                            <option value="Ropa">
-                                Ropa
-                            </option>
-
-                            <option value="Accesorios">
-                                Accesorios
-                            </option>
-
-                            <option value="Calzado">
-                                Calzado
-                            </option>
-
-                            <option value="Tecnología">
-                                Tecnología
-                            </option>
-
-                        </select>
-
-                        <input
-                            type="number"
-                            id="stockProducto"
-                            placeholder="Stock"
-                            min="0"
-                            max="999"
-                        >
-
-                        <button
-                            id="btnGuardarProducto"
-                            onclick="guardarProducto()"
-                        >
-                            Agregar Producto
+                        <button type="button" onclick="subirImagenProducto()">
+                            Subir imagen
                         </button>
 
-                    </div>
+                        <select id="categoriaProducto">
+                            <option value="">Selecciona categoría</option>
+                            <option value="Cascos">Cascos</option>
+                            <option value="Ropa">Ropa</option>
+                            <option value="Accesorios">Accesorios</option>
+                            <option value="Calzado">Calzado</option>
+                            <option value="Tecnología">Tecnología</option>
+                        </select>
 
+                        <input type="number" id="stockProducto" placeholder="Stock" min="0" max="999">
+
+                        <button id="btnGuardarProducto" onclick="guardarProducto()">
+                            Agregar Producto
+                        </button>
+                    </div>
                 </div>
+            </section>
 
-            </section>            <!-- PRODUCTOS REGISTRADOS -->
-
-            <section
-                id="productosRegistrados"
-                class="admin-section"
-            >
-
+            <section id="productosRegistrados" class="admin-section">
                 <div class="header-admin">
-
                     <div>
-
                         <h1>📋 Productos Registrados</h1>
-
-                        <p>
-                            Consulta, busca y administra productos existentes.
-                        </p>
-
+                        <p>Consulta, busca y administra productos existentes.</p>
                     </div>
-
                 </div>
 
                 <div class="section">
-
                     <div class="filtros-admin">
-
                         <input
                             type="text"
                             id="buscarProducto"
@@ -856,101 +696,67 @@ RESPONSIVE
                             maxlength="50"
                         >
 
-                        <select
-                            id="filtroCategoria"
-                            onchange="filtrarProductosAdmin()"
-                        >
-
-                            <option value="">
-                                Todas las categorías
-                            </option>
-
-                            <option value="Cascos">
-                                Cascos
-                            </option>
-
-                            <option value="Ropa">
-                                Ropa
-                            </option>
-
-                            <option value="Accesorios">
-                                Accesorios
-                            </option>
-
-                            <option value="Calzado">
-                                Calzado
-                            </option>
-
-                            <option value="Tecnología">
-                                Tecnología
-                            </option>
-
+                        <select id="filtroCategoria" onchange="filtrarProductosAdmin()">
+                            <option value="">Todas las categorías</option>
+                            <option value="Cascos">Cascos</option>
+                            <option value="Ropa">Ropa</option>
+                            <option value="Accesorios">Accesorios</option>
+                            <option value="Calzado">Calzado</option>
+                            <option value="Tecnología">Tecnología</option>
                         </select>
-
                     </div>
 
                     <div class="table-container">
-
                         <table>
-
                             <thead>
-
                                 <tr>
-
                                     <th>ID</th>
                                     <th>Producto</th>
                                     <th>Categoría</th>
                                     <th>Precio</th>
                                     <th>Stock</th>
                                     <th>Acciones</th>
-
                                 </tr>
-
                             </thead>
 
-                            <tbody id="tablaProductos">
-
-                            </tbody>
-
+                            <tbody id="tablaProductos"></tbody>
                         </table>
-
                     </div>
-
                 </div>
-
             </section>
 
-            <!-- PEDIDOS -->
-
-            <section
-                id="pedidos"
-                class="admin-section"
-            >
-
+            <section id="pedidos" class="admin-section">
                 <div class="header-admin">
-
                     <div>
-
                         <h1>🧾 Pedidos Recientes</h1>
-
-                        <p>
-                            Seguimiento y control de pedidos.
-                        </p>
-
+                        <p>Seguimiento y control de pedidos.</p>
                     </div>
-
                 </div>
 
                 <div class="section">
 
+                    <div class="filtros-admin">
+                        <input
+                            type="text"
+                            id="buscarPedido"
+                            placeholder="Buscar por cliente, teléfono o ID..."
+                            oninput="filtrarPedidosAdmin()"
+                            maxlength="50"
+                        >
+
+                        <select id="filtroEstadoPedido" onchange="filtrarPedidosAdmin()">
+                            <option value="">Todos los estados</option>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="Enviado">Enviado</option>
+                            <option value="Entregado">Entregado</option>
+                            <option value="Cancelado">Cancelado</option>
+                        </select>
+                    </div>
+
                     <div class="table-container">
-
                         <table>
-
                             <thead>
-
                                 <tr>
-
                                     <th>ID</th>
                                     <th>Cliente</th>
                                     <th>Teléfono</th>
@@ -958,35 +764,25 @@ RESPONSIVE
                                     <th>Total</th>
                                     <th>Estado</th>
                                     <th>Acciones</th>
-
                                 </tr>
-
                             </thead>
 
-                            <tbody id="tablaPedidos">
-
-                            </tbody>
-
+                            <tbody id="tablaPedidos"></tbody>
                         </table>
-
                     </div>
-
                 </div>
+            </section>
 
-            </section>        </main>
-
+        </main>
     </div>
-
-</div>
-
-<script>
+</div><script>
 
 const API_URL =
     'https://backend-strike-motards.onrender.com';
 
 let productoEditando = null;
-
 let productosAdmin = [];
+let pedidosAdmin = [];
 
 /* =========================
 MENÚ LATERAL
@@ -1012,11 +808,8 @@ function mostrarModulo(id, boton){
 
 function cerrarSesionAdmin(){
 
-    document.getElementById('adminPanel')
-        .style.display = 'none';
-
-    document.getElementById('loginContainer')
-        .style.display = 'flex';
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('loginContainer').style.display = 'flex';
 
 }
 
@@ -1034,11 +827,8 @@ function loginAdmin(){
 
     if(usuario === 'admin' && password === 'geramx'){
 
-        document.getElementById('loginContainer')
-            .style.display = 'none';
-
-        document.getElementById('adminPanel')
-            .style.display = 'block';
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
 
         cargarResumen();
         cargarProductos();
@@ -1066,29 +856,24 @@ async function cargarResumen(){
         const data =
             await respuesta.json();
 
-        document.getElementById('totalPedidos')
-            .textContent =
+        document.getElementById('totalPedidos').textContent =
             data.totalPedidos;
 
-        document.getElementById('ventasTotales')
-            .textContent =
-            `$${Number(data.totalVentas)
-                .toLocaleString('es-MX')}`;
+        document.getElementById('ventasTotales').textContent =
+            `$${Number(data.totalVentas).toLocaleString('es-MX')}`;
 
-        document.getElementById('totalProductos')
-            .textContent =
+        document.getElementById('totalProductos').textContent =
             data.totalProductos;
 
     }catch(error){
 
-        console.error(
-            'Error cargando resumen:',
-            error
-        );
+        console.error('Error cargando resumen:', error);
 
     }
 
-}/* =========================
+}
+
+/* =========================
 CARGAR PRODUCTOS
 ========================= */
 
@@ -1096,20 +881,28 @@ async function cargarProductos(){
 
     try{
 
-        const respuesta = await fetch(`${API_URL}/productos`);
-        const productos = await respuesta.json();
+        const respuesta =
+            await fetch(`${API_URL}/productos`);
+
+        const productos =
+            await respuesta.json();
 
         productosAdmin = productos;
+
         renderizarProductosAdmin(productos);
 
     }catch(error){
+
         console.error('Error cargando productos:', error);
+
     }
 }
 
 function renderizarProductosAdmin(productos){
 
-    const tabla = document.getElementById('tablaProductos');
+    const tabla =
+        document.getElementById('tablaProductos');
+
     tabla.innerHTML = '';
 
     productos.forEach(producto => {
@@ -1150,19 +943,23 @@ function renderizarProductosAdmin(productos){
 
 function filtrarProductosAdmin(){
 
-    const texto = document.getElementById('buscarProducto').value.toLowerCase();
-    const categoria = document.getElementById('filtroCategoria').value;
+    const texto =
+        document.getElementById('buscarProducto').value.toLowerCase();
 
-    const filtrados = productosAdmin.filter(producto => {
+    const categoria =
+        document.getElementById('filtroCategoria').value;
 
-        const coincideTexto =
-            producto.nombre.toLowerCase().includes(texto);
+    const filtrados =
+        productosAdmin.filter(producto => {
 
-        const coincideCategoria =
-            categoria === '' || producto.categoria === categoria;
+            const coincideTexto =
+                producto.nombre.toLowerCase().includes(texto);
 
-        return coincideTexto && coincideCategoria;
-    });
+            const coincideCategoria =
+                categoria === '' || producto.categoria === categoria;
+
+            return coincideTexto && coincideCategoria;
+        });
 
     renderizarProductosAdmin(filtrados);
 }
@@ -1175,107 +972,148 @@ async function cargarPedidos(){
 
     try{
 
-        const respuesta = await fetch(`${API_URL}/pedidos`);
-        const pedidos = await respuesta.json();
+        const respuesta =
+            await fetch(`${API_URL}/pedidos`);
 
-        const tabla = document.getElementById('tablaPedidos');
-        tabla.innerHTML = '';
+        const pedidos =
+            await respuesta.json();
 
-        pedidos.forEach(pedido => {
+        pedidosAdmin = pedidos;
 
-            tabla.innerHTML += `
-                <tr>
-                    <td>#${pedido.id}</td>
-
-                    <td class="nombre-col" title="${pedido.nombre_cliente}">
-                        ${pedido.nombre_cliente}
-                    </td>
-
-                    <td>${pedido.telefono}</td>
-
-                    <td class="direccion-col" title="${pedido.direccion}">
-                        ${pedido.direccion}
-                    </td>
-
-                    <td>$${Number(pedido.total).toLocaleString('es-MX')}</td>
-
-                    <td>
-    <select
-        class="estado-select"
-        onchange="cambiarEstadoPedido(${pedido.id}, this.value)"
-    >
-        <option value="Pendiente" ${pedido.estado === 'Pendiente' ? 'selected' : ''}>
-            Pendiente
-        </option>
-
-        <option value="Enviado" ${pedido.estado === 'Enviado' ? 'selected' : ''}>
-            Enviado
-        </option>
-
-        <option value="Entregado" ${pedido.estado === 'Entregado' ? 'selected' : ''}>
-            Entregado
-        </option>
-
-        <option value="Cancelado" ${pedido.estado === 'Cancelado' ? 'selected' : ''}>
-            Cancelado
-        </option>
-    </select>
-</td>
-
-<td class="acciones-pedido">
-    <button
-    onclick="verDetallePedido(${pedido.id})"
-    class="btn-detalle"
->
-    👁 Detalle
-</button>
-
-<button
-    onclick="verTicket(${pedido.id})"
-    class="btn-ticket"
->
-    📄 Ticket
-</button>
-
-<button
-    onclick="contactarWhatsapp('${pedido.telefono}', ${pedido.id})"
-    class="btn-whatsapp"
->
-    💬 WhatsApp
-</button>
-</td>
-                </tr>
-            `;
-        });
+        renderizarPedidosAdmin(pedidos);
 
     }catch(error){
+
         console.error('Error cargando pedidos:', error);
+
     }
 }
+
+function renderizarPedidosAdmin(pedidos){
+
+    const tabla =
+        document.getElementById('tablaPedidos');
+
+    tabla.innerHTML = '';
+
+    pedidos.forEach(pedido => {
+
+        tabla.innerHTML += `
+            <tr>
+                <td>#${pedido.id}</td>
+
+                <td class="nombre-col" title="${pedido.nombre_cliente}">
+                    ${pedido.nombre_cliente}
+                </td>
+
+                <td>${pedido.telefono}</td>
+
+                <td class="direccion-col" title="${pedido.direccion}">
+                    ${pedido.direccion}
+                </td>
+
+                <td>$${Number(pedido.total).toLocaleString('es-MX')}</td>
+
+                <td>
+                    <select
+                        class="estado-select"
+                        onchange="cambiarEstadoPedido(${pedido.id}, this.value)"
+                    >
+                        <option value="Pendiente" ${pedido.estado === 'Pendiente' ? 'selected' : ''}>
+                            Pendiente
+                        </option>
+
+                        <option value="Enviado" ${pedido.estado === 'Enviado' ? 'selected' : ''}>
+                            Enviado
+                        </option>
+
+                        <option value="Entregado" ${pedido.estado === 'Entregado' ? 'selected' : ''}>
+                            Entregado
+                        </option>
+
+                        <option value="Cancelado" ${pedido.estado === 'Cancelado' ? 'selected' : ''}>
+                            Cancelado
+                        </option>
+                    </select>
+                </td>
+
+                <td class="acciones-pedido">
+                    <button
+                        onclick="verDetallePedido(${pedido.id})"
+                        class="btn-detalle"
+                    >
+                        👁 Detalle
+                    </button>
+
+                    <button
+                        onclick="verTicket(${pedido.id})"
+                        class="btn-ticket"
+                    >
+                        📄 Ticket
+                    </button>
+
+                    <button
+                        onclick="contactarWhatsapp('${pedido.telefono}', ${pedido.id})"
+                        class="btn-whatsapp"
+                    >
+                        💬 WhatsApp
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+}
+
+function filtrarPedidosAdmin(){
+
+    const texto =
+        document.getElementById('buscarPedido').value.toLowerCase();
+
+    const estado =
+        document.getElementById('filtroEstadoPedido').value;
+
+    const filtrados =
+        pedidosAdmin.filter(pedido => {
+
+            const coincideTexto =
+                String(pedido.id).includes(texto) ||
+                pedido.nombre_cliente.toLowerCase().includes(texto) ||
+                pedido.telefono.includes(texto);
+
+            const coincideEstado =
+                estado === '' || pedido.estado === estado;
+
+            return coincideTexto && coincideEstado;
+        });
+
+    renderizarPedidosAdmin(filtrados);
+}
+
 async function verDetallePedido(id){
 
     try{
 
-        const respuesta = await fetch(`${API_URL}/pedidos`);
-        const pedidos = await respuesta.json();
-
-        const pedido = pedidos.find(p => Number(p.id) === Number(id));
+        const pedido =
+            pedidosAdmin.find(p => Number(p.id) === Number(id));
 
         if(!pedido){
             alert('No se encontró el pedido');
             return;
         }
 
-        const productosHTML = pedido.detalles.map(detalle => `
-            <div class="detalle-producto">
-                <strong>${detalle.nombre_producto}</strong><br>
-                Cantidad: ${detalle.cantidad}<br>
-                Precio unitario: $${Number(detalle.precio_unitario).toLocaleString('es-MX')}<br>
-                Subtotal: $${Number(detalle.subtotal).toLocaleString('es-MX')}
-            </div>
-        `).join('');
+        const productosHTML =
+            pedido.detalles.map(detalle => `
+                <div class="detalle-producto">
+                    <strong>${detalle.nombre_producto}</strong><br>
+                    Cantidad: ${detalle.cantidad}<br>
+                    Precio unitario: $${Number(detalle.precio_unitario).toLocaleString('es-MX')}<br>
+                    Subtotal: $${Number(detalle.subtotal).toLocaleString('es-MX')}
+                </div>
+            `).join('');
 
-        const modal = document.createElement('div');
+        const modal =
+            document.createElement('div');
+
         modal.id = 'detallePedidoModal';
 
         modal.innerHTML = `
@@ -1323,12 +1161,14 @@ async function verDetallePedido(id){
 
 function cerrarDetallePedido(){
 
-    const modal = document.getElementById('detallePedidoModal');
+    const modal =
+        document.getElementById('detallePedidoModal');
 
     if(modal){
         modal.remove();
     }
 }
+
 function verTicket(id){
 
     window.open(
@@ -1340,11 +1180,14 @@ function verTicket(id){
 
 function contactarWhatsapp(telefono, id){
 
+    const telefonoLimpio =
+        String(telefono).replace(/\D/g, '');
+
     const mensaje =
         `Hola, te contactamos de Strike Motards respecto a tu pedido #${id}.`;
 
     const url =
-        `https://wa.me/52${telefono}?text=${encodeURIComponent(mensaje)}`;
+        `https://wa.me/52${telefonoLimpio}?text=${encodeURIComponent(mensaje)}`;
 
     window.open(url, '_blank');
 
@@ -1354,31 +1197,42 @@ async function cambiarEstadoPedido(id, estado){
 
     try{
 
-        const respuesta = await fetch(`${API_URL}/admin/pedidos/${id}/estado`, {
-            method:'PUT',
-            headers:{ 'Content-Type':'application/json' },
-            body:JSON.stringify({ estado })
-        });
+        const respuesta =
+            await fetch(`${API_URL}/admin/pedidos/${id}/estado`, {
+                method:'PUT',
+                headers:{ 'Content-Type':'application/json' },
+                body:JSON.stringify({ estado })
+            });
 
-        const data = await respuesta.json();
+        const data =
+            await respuesta.json();
 
         if(!respuesta.ok){
             alert(data.error || 'Error al cambiar estado');
             return;
         }
 
-        cargarPedidos();
+        await cargarPedidos();
+
+        filtrarPedidosAdmin();
 
     }catch(error){
+
         console.error('Error cambiando estado:', error);
         alert('Error al cambiar estado');
+
     }
-}
+}/* =========================
+IMÁGENES CLOUDINARY
+========================= */
 
 function previsualizarImagenProducto(){
 
-    const archivo = document.getElementById('archivoImagenProducto').files[0];
-    const preview = document.getElementById('previewImagenProducto');
+    const archivo =
+        document.getElementById('archivoImagenProducto').files[0];
+
+    const preview =
+        document.getElementById('previewImagenProducto');
 
     if(!archivo){
         preview.style.display = 'none';
@@ -1392,39 +1246,48 @@ function previsualizarImagenProducto(){
 
 async function subirImagenProducto(){
 
-    const archivo = document.getElementById('archivoImagenProducto').files[0];
+    const archivo =
+        document.getElementById('archivoImagenProducto').files[0];
 
     if(!archivo){
         alert('Selecciona una imagen primero');
         return;
     }
 
-    const formData = new FormData();
+    const formData =
+        new FormData();
+
     formData.append('imagen', archivo);
 
     try{
 
-        const respuesta = await fetch(`${API_URL}/admin/upload-imagen`, {
-            method: 'POST',
-            body: formData
-        });
+        const respuesta =
+            await fetch(`${API_URL}/admin/upload-imagen`, {
+                method: 'POST',
+                body: formData
+            });
 
-        const data = await respuesta.json();
+        const data =
+            await respuesta.json();
 
         if(!respuesta.ok){
             alert(data.error || 'Error al subir imagen');
             return;
         }
 
-        document.getElementById('imagenProducto').value = data.url;
+        document.getElementById('imagenProducto').value =
+            data.url;
 
         alert('Imagen subida correctamente');
 
     }catch(error){
+
         console.error('Error subiendo imagen:', error);
         alert('Error al subir imagen');
+
     }
 }
+
 /* =========================
 PRODUCTOS
 ========================= */
@@ -1439,11 +1302,11 @@ async function guardarProducto(){
         categoria: document.getElementById('categoriaProducto').value,
         stock: Number(document.getElementById('stockProducto').value)
     };
-    
+
     if(!producto.imagen_url){
-    alert('Primero selecciona y sube una imagen');
-    return;
-}
+        alert('Primero selecciona y sube una imagen');
+        return;
+    }
 
     if(!producto.nombre || producto.nombre.length < 3){
         alert('El nombre debe tener al menos 3 caracteres');
@@ -1472,21 +1335,31 @@ async function guardarProducto(){
 
     try{
 
-        let url = `${API_URL}/admin/productos`;
-        let metodo = 'POST';
+        let url =
+            `${API_URL}/admin/productos`;
+
+        let metodo =
+            'POST';
 
         if(productoEditando){
-            url = `${API_URL}/admin/productos/${productoEditando}`;
-            metodo = 'PUT';
+            url =
+                `${API_URL}/admin/productos/${productoEditando}`;
+
+            metodo =
+                'PUT';
         }
 
-        const respuesta = await fetch(url, {
-            method:metodo,
-            headers:{ 'Content-Type':'application/json' },
-            body:JSON.stringify(producto)
-        });
+        const respuesta =
+            await fetch(url, {
+                method: metodo,
+                headers: {
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify(producto)
+            });
 
-        const data = await respuesta.json();
+        const data =
+            await respuesta.json();
 
         if(!respuesta.ok){
             alert(data.error || 'Error al guardar producto');
@@ -1496,8 +1369,9 @@ async function guardarProducto(){
         alert(productoEditando ? 'Producto actualizado' : 'Producto agregado');
 
         limpiarFormulario();
-        cargarProductos();
-        cargarResumen();
+
+        await cargarProductos();
+        await cargarResumen();
 
         mostrarModulo(
             'productosRegistrados',
@@ -1505,21 +1379,52 @@ async function guardarProducto(){
         );
 
     }catch(error){
+
         console.error('Error guardando producto:', error);
         alert('Error al guardar producto');
+
     }
 }
 
 function editarProducto(producto){
 
-    productoEditando = producto.id;
+    productoEditando =
+        producto.id;
 
-    document.getElementById('nombreProducto').value = producto.nombre;
-    document.getElementById('descripcionProducto').value = producto.descripcion || '';
-    document.getElementById('precioProducto').value = producto.precio;
-    document.getElementById('imagenProducto').value = producto.imagen_url || '';
-    document.getElementById('categoriaProducto').value = producto.categoria;
-    document.getElementById('stockProducto').value = producto.stock;
+    document.getElementById('nombreProducto').value =
+        producto.nombre;
+
+    document.getElementById('descripcionProducto').value =
+        producto.descripcion || '';
+
+    document.getElementById('precioProducto').value =
+        producto.precio;
+
+    document.getElementById('imagenProducto').value =
+        producto.imagen_url || '';
+
+    document.getElementById('categoriaProducto').value =
+        producto.categoria;
+
+    document.getElementById('stockProducto').value =
+        producto.stock;
+
+    const preview =
+        document.getElementById('previewImagenProducto');
+
+    if(producto.imagen_url){
+        preview.src =
+            producto.imagen_url;
+
+        preview.style.display =
+            'block';
+    }else{
+        preview.src =
+            '';
+
+        preview.style.display =
+            'none';
+    }
 
     document.getElementById('btnGuardarProducto').textContent =
         'Actualizar Producto';
@@ -1539,11 +1444,13 @@ async function eliminarProducto(id){
 
     try{
 
-        const respuesta = await fetch(`${API_URL}/admin/productos/${id}`, {
-            method:'DELETE'
-        });
+        const respuesta =
+            await fetch(`${API_URL}/admin/productos/${id}`, {
+                method:'DELETE'
+            });
 
-        const data = await respuesta.json();
+        const data =
+            await respuesta.json();
 
         if(!respuesta.ok){
             alert(data.error || 'Error al eliminar producto');
@@ -1552,28 +1459,48 @@ async function eliminarProducto(id){
 
         alert('Producto eliminado correctamente');
 
-        cargarProductos();
-        cargarResumen();
+        await cargarProductos();
+        await cargarResumen();
 
     }catch(error){
+
         console.error('Error eliminando producto:', error);
         alert('Error al eliminar producto');
+
     }
 }
 
 function limpiarFormulario(){
 
-    productoEditando = null;
+    productoEditando =
+        null;
 
-    document.getElementById('nombreProducto').value = '';
-    document.getElementById('descripcionProducto').value = '';
-    document.getElementById('precioProducto').value = '';
-    document.getElementById('imagenProducto').value = '';
-    document.getElementById('archivoImagenProducto').value = '';
-    document.getElementById('previewImagenProducto').src = '';
-    document.getElementById('previewImagenProducto').style.display = 'none';
-    document.getElementById('categoriaProducto').value = '';
-    document.getElementById('stockProducto').value = '';
+    document.getElementById('nombreProducto').value =
+        '';
+
+    document.getElementById('descripcionProducto').value =
+        '';
+
+    document.getElementById('precioProducto').value =
+        '';
+
+    document.getElementById('imagenProducto').value =
+        '';
+
+    document.getElementById('archivoImagenProducto').value =
+        '';
+
+    document.getElementById('previewImagenProducto').src =
+        '';
+
+    document.getElementById('previewImagenProducto').style.display =
+        'none';
+
+    document.getElementById('categoriaProducto').value =
+        '';
+
+    document.getElementById('stockProducto').value =
+        '';
 
     document.getElementById('btnGuardarProducto').textContent =
         'Agregar Producto';
