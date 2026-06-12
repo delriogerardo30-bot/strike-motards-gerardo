@@ -1023,7 +1023,7 @@ function showToast(message) {
 
     setTimeout(() => {
         toast.remove();
-    }, 1800);
+    }, 2200);
 }
 
 // ==================== SECCIONES ====================
