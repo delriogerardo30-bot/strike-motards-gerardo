@@ -1041,6 +1041,26 @@ app.post('/usuarios/registro', async (req, res) => {
   }
 });
 /* =========================
+   ADMIN VER USUARIOS
+========================= */
+app.get('/admin/usuarios', verificarAdmin, async (req, res) => {
+  try {
+    const usuarios = await Usuario.findAll({
+      attributes: ['id', 'nombre', 'telefono', 'correo', 'fecha_registro'],
+      order: [['id', 'DESC']]
+    });
+
+    res.json(usuarios);
+
+  } catch (err) {
+    console.error('Error al obtener usuarios:', err);
+
+    res.status(500).json({
+      error: 'Error al obtener usuarios'
+    });
+  }
+});
+/* =========================
    LOGIN ADMIN
 ========================= */
 app.post('/admin/login', (req, res) => {

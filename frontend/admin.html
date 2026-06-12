@@ -597,6 +597,7 @@ RESPONSIVE
                 <button class="menu-btn" onclick="mostrarModulo('gestionProductos', this)">📦 Gestión de productos</button>
                 <button class="menu-btn" onclick="mostrarModulo('productosRegistrados', this)">📋 Productos registrados</button>
                 <button class="menu-btn" onclick="mostrarModulo('pedidos', this)">🧾 Pedidos recientes</button>
+                <button class="menu-btn" onclick="mostrarModulo('usuariosRegistrados', this)">👥 Usuarios registrados</button>
                 <button class="menu-btn logout-btn" onclick="cerrarSesionAdmin()">🚪 Cerrar sesión</button>
             </div>
         </aside>
@@ -797,6 +798,42 @@ RESPONSIVE
                     </div>
                 </div>
             </section>
+            <section id="usuariosRegistrados" class="admin-section">
+    <div class="header-admin">
+        <div>
+            <h1>👥 Usuarios Registrados</h1>
+            <p>Consulta los usuarios que han creado una cuenta en la tienda.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="filtros-admin">
+            <input
+                type="text"
+                id="buscarUsuario"
+                placeholder="Buscar por nombre, correo o teléfono..."
+                oninput="filtrarUsuariosAdmin()"
+                maxlength="50"
+            >
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th>Fecha registro</th>
+                    </tr>
+                </thead>
+
+                <tbody id="tablaUsuarios"></tbody>
+            </table>
+        </div>
+    </div>
+</section>
 
         </main>
     </div>
@@ -819,6 +856,7 @@ function getAdminHeaders(){
 let productoEditando = null;
 let productosAdmin = [];
 let pedidosAdmin = [];
+let usuariosAdmin = [];
 let graficaEstados = null;
 let graficaVentas = null;
 
@@ -914,6 +952,7 @@ async function loginAdmin(){
         await cargarResumen();
         await cargarProductos();
         await cargarPedidos();
+        await cargarUsuarios();
 
     }catch(error){
 
@@ -1082,6 +1121,109 @@ async function cargarPedidos(){
         console.error('Error cargando pedidos:', error);
 
     }
+}
+async function cargarUsuarios(){
+
+    try{
+
+        const respuesta =
+            await fetch(`${API_URL}/admin/usuarios`, {
+                headers:{
+                    'Authorization': `Bearer ${getAdminToken()}`
+                }
+            });
+
+        const usuarios =
+            await respuesta.json();
+
+        usuariosAdmin =
+            usuarios;
+
+        renderizarUsuariosAdmin(usuarios);
+
+    }catch(error){
+
+        console.error(
+            'Error cargando usuarios:',
+            error
+        );
+
+    }
+
+}
+function renderizarUsuariosAdmin(usuarios){
+
+    const tabla =
+        document.getElementById('tablaUsuarios');
+
+    if(!tabla) return;
+
+    tabla.innerHTML = '';
+
+    if(!usuarios.length){
+
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align:center; color:#b8c6d8;">
+                    No hay usuarios registrados.
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    usuarios.forEach(usuario => {
+
+        const fecha =
+            usuario.fecha_registro
+                ? new Date(usuario.fecha_registro).toLocaleString('es-MX')
+                : 'Sin fecha';
+
+        tabla.innerHTML += `
+            <tr>
+                <td>#${usuario.id}</td>
+
+                <td class="nombre-col" title="${usuario.nombre}">
+                    ${usuario.nombre}
+                </td>
+
+                <td>${usuario.telefono}</td>
+
+                <td title="${usuario.correo}">
+                    ${usuario.correo}
+                </td>
+
+                <td>${fecha}</td>
+            </tr>
+        `;
+    });
+}
+function filtrarUsuariosAdmin(){
+
+    const texto =
+        document.getElementById('buscarUsuario').value.toLowerCase();
+
+    const filtrados =
+        usuariosAdmin.filter(usuario => {
+
+            const nombre =
+                String(usuario.nombre || '').toLowerCase();
+
+            const correo =
+                String(usuario.correo || '').toLowerCase();
+
+            const telefono =
+                String(usuario.telefono || '');
+
+            return (
+                nombre.includes(texto) ||
+                correo.includes(texto) ||
+                telefono.includes(texto)
+            );
+        });
+
+    renderizarUsuariosAdmin(filtrados);
 }
 
 function renderizarPedidosAdmin(pedidos){
