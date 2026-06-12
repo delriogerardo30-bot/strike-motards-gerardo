@@ -10,6 +10,7 @@ const fs = require('fs');
 const path = require('path');
 const cloudinary = require('cloudinary').v2;
 const multer = require('multer');
+const crypto = require('crypto');
 
 const app = express();
 
@@ -24,6 +25,27 @@ cloudinary.config({
 const upload = multer({
   storage: multer.memoryStorage()
 });
+const adminSessions = new Set();
+
+function verificarAdmin(req, res, next) {
+  const authHeader = req.headers.authorization;
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      error: 'Acceso no autorizado'
+    });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  if (!adminSessions.has(token)) {
+    return res.status(403).json({
+      error: 'Sesión admin inválida'
+    });
+  }
+
+  next();
+}
 
 /* =========================
    CONEXIÓN A POSTGRES
@@ -786,7 +808,7 @@ if (tableY > 540) {
    CAMBIAR ESTADO PEDIDO
 ========================= */
 
-app.put('/admin/pedidos/:id/estado', async (req, res) => {
+app.put('/admin/pedidos/:id/estado', verificarAdmin, async (req, res) => {
 
   try {
 
@@ -825,7 +847,7 @@ app.put('/admin/pedidos/:id/estado', async (req, res) => {
 /* =========================
    API RESUMEN ADMIN
 ========================= */
-app.get('/admin/resumen', async (req, res) => {
+app.get('/admin/resumen', verificarAdmin, async (req, res) => {
   try {
     const totalProductos = await Producto.count();
     const totalPedidos = await Pedido.count();
@@ -862,7 +884,7 @@ app.get('/admin/resumen', async (req, res) => {
 ========================= */
 
 // AGREGAR PRODUCTO
-app.post('/admin/productos', async (req, res) => {
+app.post('/admin/productos', verificarAdmin, async (req, res) => {
   try {
     const { nombre, descripcion, precio, imagen_url, categoria, stock } = req.body;
 
@@ -891,7 +913,7 @@ app.post('/admin/productos', async (req, res) => {
 });
 
 // EDITAR PRODUCTO
-app.put('/admin/productos/:id', async (req, res) => {
+app.put('/admin/productos/:id', verificarAdmin, async (req, res) => {
   try {
     const { id } = req.params;
     const { nombre, descripcion, precio, imagen_url, categoria, stock } = req.body;
@@ -923,7 +945,7 @@ app.put('/admin/productos/:id', async (req, res) => {
 });
 
 // ELIMINAR PRODUCTO
-app.delete('/admin/productos/:id', async (req, res) => {
+app.delete('/admin/productos/:id', verificarAdmin, async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -1018,7 +1040,32 @@ app.post('/usuarios/registro', async (req, res) => {
     });
   }
 });
+/* =========================
+   LOGIN ADMIN
+========================= */
+app.post('/admin/login', (req, res) => {
+  const { usuario, password } = req.body;
 
+  const ADMIN_USER = process.env.ADMIN_USER || 'admin';
+  const ADMIN_PASS = process.env.ADMIN_PASS || 'geramx';
+
+  if (usuario === ADMIN_USER && password === ADMIN_PASS) {
+    const token = crypto.randomBytes(32).toString('hex');
+
+    adminSessions.add(token);
+
+    return res.json({
+      ok: true,
+      mensaje: 'Login correcto',
+      token
+    });
+  }
+
+  return res.status(401).json({
+    ok: false,
+    error: 'Usuario o contraseña incorrectos'
+  });
+});
 /* =========================
    LOGIN DE USUARIO
 ========================= */
@@ -1079,7 +1126,7 @@ app.get('/', (req, res) => {
 // SUBIR IMÁGENES A CLOUDINARY
 // ====================================
 
-app.post('/admin/upload-imagen', upload.single('imagen'), async (req, res) => {
+app.post('/admin/upload-imagen', verificarAdmin, upload.single('imagen'), async (req, res) => {
 
   
   try {

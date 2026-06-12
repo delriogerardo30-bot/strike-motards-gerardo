@@ -805,6 +805,17 @@ RESPONSIVE
 const API_URL =
     'https://backend-strike-motards.onrender.com';
 
+    function getAdminToken(){
+    return localStorage.getItem('adminToken');
+}
+
+function getAdminHeaders(){
+    return {
+        'Content-Type':'application/json',
+        'Authorization': `Bearer ${getAdminToken()}`
+    };
+}
+
 let productoEditando = null;
 let productosAdmin = [];
 let pedidosAdmin = [];
@@ -835,8 +846,20 @@ function mostrarModulo(id, boton){
 
 function cerrarSesionAdmin(){
 
-    document.getElementById('adminPanel').style.display = 'none';
-    document.getElementById('loginContainer').style.display = 'flex';
+    localStorage.removeItem('adminLogueado');
+    localStorage.removeItem('adminToken');
+
+    document.getElementById('adminPanel').style.display =
+        'none';
+
+    document.getElementById('loginContainer').style.display =
+        'flex';
+
+    document.getElementById('usuario').value =
+        '';
+
+    document.getElementById('password').value =
+        '';
 
 }
 
@@ -844,7 +867,7 @@ function cerrarSesionAdmin(){
 LOGIN ADMIN
 ========================= */
 
-function loginAdmin(){
+async function loginAdmin(){
 
     const usuario =
         document.getElementById('usuario').value.trim();
@@ -852,18 +875,50 @@ function loginAdmin(){
     const password =
         document.getElementById('password').value.trim();
 
-    if(usuario === 'admin' && password === 'geramx'){
+    if(!usuario || !password){
+        alert('Completa usuario y contraseña');
+        return;
+    }
 
-        document.getElementById('loginContainer').style.display = 'none';
-        document.getElementById('adminPanel').style.display = 'block';
+    try{
 
-        cargarResumen();
-        cargarProductos();
-        cargarPedidos();
+        const respuesta =
+            await fetch(`${API_URL}/admin/login`, {
+                method:'POST',
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify({
+                    usuario,
+                    password
+                })
+            });
 
-    }else{
+        const data =
+            await respuesta.json();
 
-        alert('Usuario o contraseña incorrectos');
+        if(!respuesta.ok){
+            alert(data.error || 'Usuario o contraseña incorrectos');
+            return;
+        }
+
+        localStorage.setItem('adminLogueado', 'true');
+        localStorage.setItem('adminToken', data.token);
+
+        document.getElementById('loginContainer').style.display =
+            'none';
+
+        document.getElementById('adminPanel').style.display =
+            'block';
+
+        await cargarResumen();
+        await cargarProductos();
+        await cargarPedidos();
+
+    }catch(error){
+
+        console.error('Error login admin:', error);
+        alert('Error al conectar con el servidor');
 
     }
 
@@ -878,7 +933,11 @@ async function cargarResumen(){
     try{
 
         const respuesta =
-            await fetch(`${API_URL}/admin/resumen`);
+    await fetch(`${API_URL}/admin/resumen`, {
+        headers:{
+            'Authorization': `Bearer ${getAdminToken()}`
+        }
+    });
 
         const data =
             await respuesta.json();
@@ -1346,11 +1405,13 @@ async function subirImagenProducto(){
     try{
 
         const respuesta =
-            await fetch(`${API_URL}/admin/upload-imagen`, {
-                method: 'POST',
-                body: formData
-            });
-
+    await fetch(`${API_URL}/admin/upload-imagen`, {
+        method: 'POST',
+        headers:{
+            'Authorization': `Bearer ${getAdminToken()}`
+        },
+        body: formData
+    });
         const data =
             await respuesta.json();
 
@@ -1434,13 +1495,11 @@ async function guardarProducto(){
         }
 
         const respuesta =
-            await fetch(url, {
-                method: metodo,
-                headers: {
-                    'Content-Type':'application/json'
-                },
-                body: JSON.stringify(producto)
-            });
+    await fetch(url, {
+        method: metodo,
+        headers: getAdminHeaders(),
+        body: JSON.stringify(producto)
+    });
 
         const data =
             await respuesta.json();
@@ -1529,9 +1588,12 @@ async function eliminarProducto(id){
     try{
 
         const respuesta =
-            await fetch(`${API_URL}/admin/productos/${id}`, {
-                method:'DELETE'
-            });
+    await fetch(`${API_URL}/admin/productos/${id}`, {
+        method:'DELETE',
+        headers:{
+            'Authorization': `Bearer ${getAdminToken()}`
+        }
+    });
 
         const data =
             await respuesta.json();
