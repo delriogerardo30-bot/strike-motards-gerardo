@@ -1660,6 +1660,44 @@
     }
 }
 
+/* ================= ANIMACIÓN MOTO AL CARRITO ================= */
+
+.moto-fly {
+    position: fixed;
+    font-size: 34px;
+    z-index: 25000;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    transition:
+        left 0.85s cubic-bezier(.22,1,.36,1),
+        top 0.85s cubic-bezier(.22,1,.36,1),
+        transform 0.85s ease,
+        opacity 0.85s ease;
+}
+
+.moto-fly.run {
+    transform: translate(-50%, -50%) scale(0.45) rotate(-12deg);
+    opacity: 0;
+}
+
+.cart-bounce {
+    animation: cartBounce 0.45s ease;
+}
+
+@keyframes cartBounce {
+    0% {
+        transform: scale(1);
+    }
+    35% {
+        transform: scale(1.18);
+    }
+    70% {
+        transform: scale(0.94);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
         /* ================= RESPONSIVE ================= */
 
         @media(max-width:1100px) {

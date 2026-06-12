@@ -383,9 +383,11 @@ function addToCart(id) {
     }
 
     updateCartCount();
-    renderCart();
+renderCart();
 
-    showToast(`${product.nombre} añadido al carrito`);
+animarMotoAlCarrito();
+
+showToast(`${product.nombre} añadido al carrito`);
 }
 
 function updateCartCount() {
@@ -581,6 +583,61 @@ function toggleCart() {
     modal.style.display = "flex";
     renderCart();
 }
+
+
+function animarMotoAlCarrito() {
+
+    const carritoBtn =
+        document.querySelector('.btn-cart');
+
+    if (!carritoBtn) return;
+
+    const destino =
+        carritoBtn.getBoundingClientRect();
+
+    const moto =
+        document.createElement('div');
+
+    moto.className = 'moto-fly';
+    moto.textContent = '🏍️';
+
+    moto.style.left =
+        `${window.innerWidth / 2}px`;
+
+    moto.style.top =
+        `${window.innerHeight / 2}px`;
+
+    document.body.appendChild(moto);
+
+    requestAnimationFrame(() => {
+
+        moto.classList.add('run');
+
+        moto.style.left =
+            `${destino.left + destino.width / 2}px`;
+
+        moto.style.top =
+            `${destino.top + destino.height / 2}px`;
+
+    });
+
+    setTimeout(() => {
+
+        carritoBtn.classList.add('cart-bounce');
+
+        moto.remove();
+
+        setTimeout(() => {
+
+            carritoBtn.classList.remove('cart-bounce');
+
+        }, 500);
+
+    }, 850);
+
+}
+
+
 
 // ==================== CHECKOUT CON VALIDACIÓN ====================
 
