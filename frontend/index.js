@@ -777,14 +777,15 @@ async function confirmOrder() {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    nombre,
-                    telefono,
-                    direccion,
-                    productos: cart.map(item => ({
-                        id: item.id,
-                        cantidad: item.quantity || 1
-                    }))
-                })
+    nombre,
+    telefono,
+    direccion,
+    usuario_id: usuarioActual ? usuarioActual.id : null,
+    productos: cart.map(item => ({
+        id: item.id,
+        cantidad: item.quantity || 1
+    }))
+})
             });
 
         const resultado =
@@ -1143,20 +1144,22 @@ let usuarioActual = null;
 
 function openUserModal() {
 
-    if (usuarioActual) {
+   if (usuarioActual) {
 
-        const cerrar =
-            confirm(
-                `Sesión iniciada como ${usuarioActual.nombre}\n\n¿Deseas cerrar sesión?`
-            );
+    document.getElementById('perfil-nombre').textContent =
+        usuarioActual.nombre || '';
 
-        if (cerrar) {
-            logoutUsuario();
-        }
+    document.getElementById('perfil-correo').textContent =
+        usuarioActual.correo || '';
 
-        return;
-    }
+    document.getElementById('perfil-telefono').textContent =
+        usuarioActual.telefono || '';
 
+    document.getElementById('profile-modal').style.display =
+        'flex';
+
+    return;
+}
     const modal =
         document.getElementById("user-modal");
 
@@ -1173,6 +1176,24 @@ function closeUserModal() {
     if (modal) {
         modal.style.display = "none";
     }
+}
+function closeProfileModal(){
+
+    const modal =
+        document.getElementById('profile-modal');
+
+    if(modal){
+        modal.style.display = 'none';
+    }
+
+}
+
+function logoutUsuarioDesdePerfil(){
+
+    closeProfileModal();
+
+    logoutUsuario();
+
 }
 
 function toggleAuthMode() {

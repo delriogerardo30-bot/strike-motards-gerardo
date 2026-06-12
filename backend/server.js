@@ -126,7 +126,11 @@ const Pedido = sequelize.define('Pedido', {
   fecha: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW
-  }
+  },
+  usuario_id: {
+  type: DataTypes.INTEGER,
+  allowNull: true
+}
 }, {
   tableName: 'pedidos',
   timestamps: false
@@ -211,6 +215,15 @@ Producto.hasMany(DetallePedido, {
 DetallePedido.belongsTo(Producto, {
   foreignKey: 'producto_id'
 });
+Usuario.hasMany(Pedido, {
+  foreignKey: 'usuario_id',
+  as: 'pedidos'
+});
+
+Pedido.belongsTo(Usuario, {
+  foreignKey: 'usuario_id',
+  as: 'usuario'
+});
 
 /* =========================
    SINCRONIZACIÓN
@@ -242,7 +255,7 @@ app.post('/pedidos', async (req, res) => {
   const transaction = await sequelize.transaction();
 
   try {
-    const { nombre, telefono, direccion, productos } = req.body;
+    const { nombre, telefono, direccion, productos, usuario_id } = req.body;
 
     if (!nombre || !telefono || !direccion) {
       await transaction.rollback();
@@ -301,12 +314,13 @@ app.post('/pedidos', async (req, res) => {
     }
 
     const pedido = await Pedido.create({
-      nombre_cliente: nombre,
-      telefono,
-      direccion,
-      total,
-      estado: 'Pendiente'
-    }, { transaction });
+  nombre_cliente: nombre,
+  telefono,
+  direccion,
+  total,
+  estado: 'Pendiente',
+  usuario_id: usuario_id || null
+}, { transaction });
 
     for (const detalle of detalles) {
       await DetallePedido.create({
@@ -1085,6 +1099,36 @@ app.post('/admin/login', (req, res) => {
     ok: false,
     error: 'Usuario o contraseña incorrectos'
   });
+});
+/* =========================
+   HISTORIAL DE PEDIDOS USUARIO
+========================= */
+app.get('/usuarios/:id/pedidos', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const pedidos = await Pedido.findAll({
+      where: {
+        usuario_id: id
+      },
+      include: [
+        {
+          model: DetallePedido,
+          as: 'detalles'
+        }
+      ],
+      order: [['id', 'DESC']]
+    });
+
+    res.json(pedidos);
+
+  } catch (err) {
+    console.error('Error al obtener pedidos del usuario:', err);
+
+    res.status(500).json({
+      error: 'Error al obtener pedidos del usuario'
+    });
+  }
 });
 /* =========================
    LOGIN DE USUARIO

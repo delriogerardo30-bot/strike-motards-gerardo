@@ -2104,7 +2104,37 @@
         </div>
 
     </div>
+<!-- ================= MODAL PERFIL USUARIO ================= -->
 
+<div id="profile-modal">
+
+    <div class="profile-card">
+
+        <button class="profile-close" onclick="closeProfileModal()">
+            ×
+        </button>
+
+        <h2>👤 Mi Perfil</h2>
+
+        <div class="profile-info">
+            <p><strong>Nombre:</strong> <span id="perfil-nombre"></span></p>
+            <p><strong>Correo:</strong> <span id="perfil-correo"></span></p>
+            <p><strong>Teléfono:</strong> <span id="perfil-telefono"></span></p>
+        </div>
+
+        <h3>📦 Mis pedidos</h3>
+
+        <div id="perfil-pedidos">
+            <p style="color:#a7b4bb;">Cargando pedidos...</p>
+        </div>
+
+        <button class="profile-logout" onclick="logoutUsuarioDesdePerfil()">
+            Cerrar sesión
+        </button>
+
+    </div>
+
+</div>
     <!-- ================= MODAL LOGIN / REGISTRO ================= -->
 
     <!-- ================= MODAL LOGIN / REGISTRO ================= -->
