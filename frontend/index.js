@@ -1156,9 +1156,11 @@ function openUserModal() {
         usuarioActual.telefono || '';
 
     document.getElementById('profile-modal').style.display =
-        'flex';
+    'flex';
 
-    return;
+cargarPedidosPerfil();
+
+return;
 }
     const modal =
         document.getElementById("user-modal");
@@ -1186,6 +1188,79 @@ function closeProfileModal(){
         modal.style.display = 'none';
     }
 
+}
+async function cargarPedidosPerfil(){
+
+    const contenedor =
+        document.getElementById('perfil-pedidos');
+
+    if(!contenedor || !usuarioActual){
+        return;
+    }
+
+    contenedor.innerHTML =
+        '<p style="color:#a7b4bb;">Cargando pedidos...</p>';
+
+    try{
+
+        const respuesta =
+            await fetch(`${API_URL}/usuarios/${usuarioActual.id}/pedidos`);
+
+        const pedidos =
+            await respuesta.json();
+
+        if(!respuesta.ok){
+            contenedor.innerHTML =
+                '<p style="color:#ff9a9a;">No se pudieron cargar tus pedidos.</p>';
+            return;
+        }
+
+        if(!pedidos.length){
+            contenedor.innerHTML =
+                '<p style="color:#a7b4bb;">Aún no tienes pedidos registrados.</p>';
+            return;
+        }
+
+        contenedor.innerHTML =
+            pedidos.map(pedido => `
+                <div style="
+                    padding:14px;
+                    border-radius:14px;
+                    background:rgba(255,255,255,0.07);
+                    margin-bottom:12px;
+                    border:1px solid rgba(255,255,255,0.10);
+                ">
+                    <strong>Pedido #${pedido.id}</strong><br>
+                    Estado: ${pedido.estado}<br>
+                    Total: $${Number(pedido.total).toLocaleString('es-MX')} MXN<br>
+                    Fecha: ${new Date(pedido.fecha).toLocaleString('es-MX')}
+
+                    <br><br>
+
+                    <button
+                        onclick="descargarTicketPDF(${pedido.id})"
+                        style="
+                            padding:10px 14px;
+                            border:none;
+                            border-radius:10px;
+                            background:#18c3ff;
+                            color:white;
+                            font-weight:800;
+                            cursor:pointer;
+                        "
+                    >
+                        📄 Descargar ticket
+                    </button>
+                </div>
+            `).join('');
+
+    }catch(error){
+
+        console.error('Error cargando pedidos perfil:', error);
+
+        contenedor.innerHTML =
+            '<p style="color:#ff9a9a;">Error al cargar pedidos.</p>';
+    }
 }
 
 function logoutUsuarioDesdePerfil(){
