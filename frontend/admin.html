@@ -1482,11 +1482,12 @@ async function cambiarEstadoPedido(id, estado){
 
     try{
 
-        await fetch(`${API_URL}/admin/pedidos/${id}/estado`, {
-    method:'PUT',
-    headers: getAdminHeaders(),
-    body: JSON.stringify({ estado })
-});
+        const respuesta =
+            await fetch(`${API_URL}/admin/pedidos/${id}/estado`, {
+                method:'PUT',
+                headers: getAdminHeaders(),
+                body: JSON.stringify({ estado })
+            });
 
         const data =
             await respuesta.json();
@@ -1506,7 +1507,9 @@ async function cambiarEstadoPedido(id, estado){
         alert('Error al cambiar estado');
 
     }
-}/* =========================
+
+}
+/* =========================
 IMÁGENES CLOUDINARY
 ========================= */
 
