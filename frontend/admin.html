@@ -1482,12 +1482,11 @@ async function cambiarEstadoPedido(id, estado){
 
     try{
 
-        const respuesta =
-            await fetch(`${API_URL}/admin/pedidos/${id}/estado`, {
-                method:'PUT',
-                headers:{ 'Content-Type':'application/json' },
-                body:JSON.stringify({ estado })
-            });
+        await fetch(`${API_URL}/admin/pedidos/${id}/estado`, {
+    method:'PUT',
+    headers: getAdminHeaders(),
+    body: JSON.stringify({ estado })
+});
 
         const data =
             await respuesta.json();
