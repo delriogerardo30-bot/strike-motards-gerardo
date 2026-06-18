@@ -23,7 +23,24 @@ cloudinary.config({
 });
 
 const upload = multer({
-  storage: multer.memoryStorage()
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  },
+  fileFilter: (req, file, cb) => {
+    const tiposPermitidos = [
+      'image/jpeg',
+      'image/png',
+      'image/jpg',
+      'image/webp'
+    ];
+
+    if (tiposPermitidos.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Solo se permiten imágenes JPG, JPEG, PNG o WEBP'));
+    }
+  }
 });
 const adminSessions = new Set();
 
@@ -263,6 +280,35 @@ app.post('/pedidos', async (req, res) => {
         error: 'Faltan datos del cliente'
       });
     }
+    const nombreRegex =
+  /^[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,50}$/;
+
+const telefonoRegex =
+  /^\d{10}$/;
+
+const direccionRegex =
+  /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]{10,120}$/;
+
+if (!nombreRegex.test(nombre)) {
+  await transaction.rollback();
+  return res.status(400).json({
+    error: 'Nombre inválido'
+  });
+}
+
+if (!telefonoRegex.test(telefono)) {
+  await transaction.rollback();
+  return res.status(400).json({
+    error: 'Teléfono inválido'
+  });
+}
+
+if (!direccionRegex.test(direccion)) {
+  await transaction.rollback();
+  return res.status(400).json({
+    error: 'Dirección inválida. Solo se permiten letras, números y espacios'
+  });
+}
 
     if (!Array.isArray(productos) || productos.length === 0) {
       await transaction.rollback();
@@ -1200,6 +1246,18 @@ app.post('/admin/upload-imagen', verificarAdmin, upload.single('imagen'), async 
         error: 'No se recibió ninguna imagen'
       });
     }
+    const tiposPermitidos = [
+  'image/jpeg',
+  'image/png',
+  'image/jpg',
+  'image/webp'
+];
+
+if (!tiposPermitidos.includes(req.file.mimetype)) {
+  return res.status(400).json({
+    error: 'Solo se permiten imágenes JPG, JPEG, PNG o WEBP'
+  });
+}
 
     const resultado = await new Promise((resolve, reject) => {
 

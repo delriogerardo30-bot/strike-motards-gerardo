@@ -686,7 +686,7 @@ function showCheckout() {
                 placeholder="Dirección de envío: calle, colonia, ciudad y CP *"
             ></textarea>
             <div class="checkout-error" id="error-direccion">
-                La dirección debe tener entre 10 y 120 caracteres.
+                La dirección debe tener entre 10 y 120 caracteres. Solo se permiten letras, números y espacios.
             </div>
 
             <div class="checkout-total">
@@ -809,10 +809,17 @@ async function confirmOrder() {
         valido = false;
     }
 
-    if (direccion.length < 10 || direccion.length > 120) {
-        setCheckoutError("cliente-direccion", "error-direccion");
-        valido = false;
-    }
+    const direccionRegex =
+    /^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/;
+
+if (
+    direccion.length < 10 ||
+    direccion.length > 120 ||
+    !direccionRegex.test(direccion)
+) {
+    setCheckoutError("cliente-direccion", "error-direccion");
+    valido = false;
+}
 
     if (!valido) return;
 

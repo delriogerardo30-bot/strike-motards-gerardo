@@ -213,7 +213,37 @@ CARDS RESUMEN
     font-size:42px;
     font-weight:bold;
 }
+/* =========================
+GRÁFICAS DASHBOARD
+========================= */
 
+.charts-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(320px, 1fr));
+    gap:25px;
+    align-items:start;
+}
+
+.chart-card{
+    background:#061c30;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:18px;
+    padding:22px;
+    min-height:340px;
+}
+
+.chart-card h3{
+    color:white;
+    margin-bottom:15px;
+}
+
+.chart-card canvas{
+    width:100% !important;
+    max-width:380px !important;
+    max-height:260px !important;
+    margin:0 auto;
+    display:block;
+}
 /* =========================
 SECCIONES
 ========================= */
@@ -668,11 +698,11 @@ RESPONSIVE
                         <input type="hidden" id="imagenProducto">
 
                         <input
-                            type="file"
-                            id="archivoImagenProducto"
-                            accept="image/*"
-                            onchange="previsualizarImagenProducto()"
-                        >
+    type="file"
+    id="archivoImagenProducto"
+    accept="image/png, image/jpeg, image/jpg, image/webp"
+    onchange="previsualizarImagenProducto()"
+>
 
                         <img
                             id="previewImagenProducto"
@@ -1515,13 +1545,31 @@ IMÁGENES CLOUDINARY
 
 function previsualizarImagenProducto(){
 
+    const input =
+        document.getElementById('archivoImagenProducto');
+
     const archivo =
-        document.getElementById('archivoImagenProducto').files[0];
+        input.files[0];
 
     const preview =
         document.getElementById('previewImagenProducto');
 
     if(!archivo){
+        preview.style.display = 'none';
+        preview.src = '';
+        return;
+    }
+
+    const tiposPermitidos = [
+        'image/jpeg',
+        'image/png',
+        'image/jpg',
+        'image/webp'
+    ];
+
+    if(!tiposPermitidos.includes(archivo.type)){
+        alert('Solo se permiten imágenes JPG, JPEG, PNG o WEBP');
+        input.value = '';
         preview.style.display = 'none';
         preview.src = '';
         return;
@@ -1540,6 +1588,18 @@ async function subirImagenProducto(){
         alert('Selecciona una imagen primero');
         return;
     }
+    const tiposPermitidos = [
+    'image/jpeg',
+    'image/png',
+    'image/jpg',
+    'image/webp'
+];
+
+if(!tiposPermitidos.includes(archivo.type)){
+    alert('Solo se permiten archivos de imagen: JPG, JPEG, PNG o WEBP');
+    document.getElementById('archivoImagenProducto').value = '';
+    return;
+}
 
     const formData =
         new FormData();
