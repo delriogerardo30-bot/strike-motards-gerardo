@@ -2276,6 +2276,28 @@
         grid-template-columns: 1fr;
     }
 }
+/* ================= CORRECCIÓN BOTÓN VER TIENDA AUTH ================= */
+
+.auth-actions button {
+    position: static !important;
+    width: auto !important;
+    height: auto !important;
+    border-radius: 14px !important;
+    transform: none !important;
+    writing-mode: horizontal-tb !important;
+    rotate: 0deg !important;
+    text-orientation: mixed !important;
+    white-space: nowrap !important;
+}
+
+.auth-actions button:hover {
+    transform: translateY(-3px) !important;
+}
+
+.auth-actions button:last-child {
+    background: rgba(255,255,255,0.10) !important;
+    color: white !important;
+}
     </style>
 </head>
 
